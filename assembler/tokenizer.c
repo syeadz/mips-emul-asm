@@ -184,7 +184,7 @@ Token *tokenize(const char *input, Token *tokens, int *num_tokens)
                 tokens[*num_tokens].type = state_to_token_type(state);
                 tokens[*num_tokens].value = strndup(token_start, input - token_start);
                 (*num_tokens)++;
-                printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
+                // printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
             }
             // Update the token start pointer and the state
             token_start = input + (next == WHITESPACE ? 1 : 0);
@@ -205,26 +205,26 @@ Token *tokenize(const char *input, Token *tokens, int *num_tokens)
         tokens[*num_tokens].type = state_to_token_type(state);
         tokens[*num_tokens].value = strndup(token_start, input - token_start);
         (*num_tokens)++;
-        printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
+        // printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
     }
 }
 
-int main()
-{
-    const char *input = "add $t0, $t1, $t2\n"
-                        "sub $t3, $t4, $t5\n"
-                        "lw $t6, 0($t7)\n"
-                        "sw $t8, 4($t9)\n"
-                        "addi $t0, $t1, 0\n"
-                        "addi $t0, $t1, 100\n"
-                        "addi $t6, $t7, 0x1A0";
+// int main()
+// {
+//     const char *input = "add $t0, $t1, $t2\n"
+//                         "sub $t3, $t4, $t5\n"
+//                         "lw $t6, 0($t7)\n"
+//                         "sw $t8, 4($t9)\n"
+//                         "addi $t0, $t1, 0\n"
+//                         "addi $t0, $t1, 100\n"
+//                         "addi $t6, $t7, 0x1A0";
 
-    Token tokens[MAX_TOKENS];
-    int num_tokens = 0;
+//     Token tokens[MAX_TOKENS];
+//     int num_tokens = 0;
 
-    tokenize(input, tokens, &num_tokens);
+//     tokenize(input, tokens, &num_tokens);
 
-    printf("Number of tokens: %d\n", num_tokens);
+//     printf("Number of tokens: %d\n", num_tokens);
 
-    return 0;
-}
+//     return 0;
+// }
