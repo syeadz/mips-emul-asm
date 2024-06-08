@@ -15,7 +15,7 @@ static StateMIPS *pState;
 void test_setup()
 {
     pState = calloc(1, sizeof(StateMIPS));
-    pState->mem = malloc(sizeof(uint32_t) * 16);
+    pState->mem = malloc(sizeof(uint32_t) * 64);
     if (!pState->mem)
     {
         perror("Failed to allocate memory");
@@ -83,7 +83,7 @@ MU_TEST_SUITE(function_tests)
 // ********* opcode tests ********* //
 
 // ADD $t1, $t2, $t3
-MU_TEST(test_add_0x00_0x20)
+MU_TEST(test_0x00_0x20_add)
 {
     // add $t1, $t2, $t3
     // t1 = t2 + t3
@@ -99,7 +99,7 @@ MU_TEST(test_add_0x00_0x20)
 }
 
 // J $addr
-MU_TEST(test_j_0x02)
+MU_TEST(test_0x02_j)
 {
     // j 0x1234567
     uint32_t instruction = 0x800000A;
@@ -110,12 +110,29 @@ MU_TEST(test_j_0x02)
     mu_assert(pState->pc == 0x0A, "J did not work correctly");
 }
 
+// BEQ $t1, $t2, 0x1234
+MU_TEST(test_0x0c_beq)
+{
+    // beq $t1, $t2, 0x1234
+    // if t1 == t2, pc += 0x1234
+    // 0x014B4820
+    pState->regs[10] = 0x1234;
+    pState->regs[8] = 0x1234;
+    uint32_t instruction = 0x3148000c;
+    pState->mem[0] = instruction;
+
+    EmulateMIPSp(pState);
+
+    mu_assert(pState->pc == 16, "Beq did not work correctly");
+}
+
 MU_TEST_SUITE(opcode_tests)
 {
     MU_SUITE_CONFIGURE(&test_setup, &test_teardown);
 
-    MU_RUN_TEST(test_add_0x00_0x20);
-    MU_RUN_TEST(test_j_0x02);
+    MU_RUN_TEST(test_0x00_0x20_add);
+    MU_RUN_TEST(test_0x02_j);
+    MU_RUN_TEST(test_0x0c_beq);
 }
 
 int main()
