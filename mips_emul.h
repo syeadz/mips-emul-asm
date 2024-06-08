@@ -129,3 +129,8 @@ void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset);
 /// @param
 /// @return
 StateMIPS *InitMIPS(void);
+
+/// @brief Emulate the MIPS processor
+/// @param state
+/// @return
+int EmulateMIPSp(StateMIPS *state);

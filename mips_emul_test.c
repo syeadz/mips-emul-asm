@@ -70,8 +70,32 @@ MU_TEST_SUITE(function_tests) {
     MU_RUN_TEST(test_decode_j_type);
 }
 
+// ********* opcode tests ********* //
+
+// ADD $t1, $t2, $t3
+MU_TEST(test_add_0x00_0x20) {
+    // add $t1, $t2, $t3
+    // t1 = t2 + t3
+    // 0x014B4820
+    pState->regs[10] = 0x1234;
+    pState->regs[8] = 0x5678;
+    uint32_t instruction = 0x01484820;
+    pState->mem[0] = instruction;
+
+    EmulateMIPSp(pState);
+
+    mu_assert(pState->regs[9] == 0x1234 + 0x5678, "Add did not work correctly");
+}
+
+MU_TEST_SUITE(opcode_tests) {
+        MU_SUITE_CONFIGURE(&test_setup, &test_teardown);
+
+    MU_RUN_TEST(test_add_0x00_0x20);
+}
+
 int main() {
     MU_RUN_SUITE(function_tests);
+    MU_RUN_SUITE(opcode_tests);
 
 	MU_REPORT();
 	return MU_EXIT_CODE;

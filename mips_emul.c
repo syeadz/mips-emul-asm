@@ -3,22 +3,22 @@
 int EmulateMIPSp(StateMIPS *state)
 {
     // int cycles = 1;
-    uint32_t *instr = &state->mem[state->pc];
-    uint8_t *opcode = (uint8_t *)instr;
+    uint32_t instr = state->mem[state->pc];
+    uint8_t opcode = (instr >> 26) & 0x3F;
 
-    r_type r = DecodeRType(*instr);
-    j_type j = DecodeJType(*instr);
-    i_type i = DecodeIType(*instr);
+    r_type r = DecodeRType(instr);
+    j_type j = DecodeJType(instr);
+    i_type i = DecodeIType(instr);
 
     state->pc += 1;
 
-    switch (*opcode)
+    switch (opcode)
     {
     case 0x00:               // arith/logic
         if (r.funct == 0x20) // add
             state->regs[r.rd] = state->regs[r.rs] + state->regs[r.rt];
         break;
-    
+
     case 0x05: // j
         state->pc = j.target;
         break;
