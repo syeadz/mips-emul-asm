@@ -134,7 +134,7 @@ MU_TEST(test_0x0c_beq)
 MU_TEST(test_0x23_lw)
 {
     // t1 = mem[t2 + 12]
-    // instruction = (0x23, 9, 10, 12)
+    // instruction = (0x23, 10, 9, 12)
     uint32_t instruction = 0x8d49000c;
     sm(0, instruction);
 
@@ -146,6 +146,23 @@ MU_TEST(test_0x23_lw)
     mu_assert(pState->regs[t1] == 0x9ABC, "Lw did not work correctly");
 }
 
+// SW $t1, offset($t2)
+MU_TEST(test_0x2b_sw)
+{
+    // mem[t2 + 12] = t1
+    // instruction = (0x2B, 10, 9, 12)
+    uint32_t instruction = 0xad49000c;
+    sm(0, instruction);
+
+    sr(t1, 0x9ABC);
+    sr(t2, 0x01);
+
+    EmulateMIPSp(pState);
+
+    mu_assert(pState->mem[0x01 + 12] == 0x9ABC, "Sw did not work correctly");
+}
+
+
 MU_TEST_SUITE(opcode_tests)
 {
     MU_SUITE_CONFIGURE(&test_setup, &test_teardown);
@@ -154,6 +171,7 @@ MU_TEST_SUITE(opcode_tests)
     MU_RUN_TEST(test_0x02_j);
     MU_RUN_TEST(test_0x0c_beq);
     MU_RUN_TEST(test_0x23_lw);
+    MU_RUN_TEST(test_0x2b_sw);
 }
 
 int main()
