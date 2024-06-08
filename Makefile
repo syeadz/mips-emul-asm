@@ -8,9 +8,7 @@ ODIR = build
 LIBS = 
 
 # Currently implements test build only
-
-all: $(ODIR)/mips_emul.o $(ODIR)/mips_emul_test.o $(ODIR)/emultest
-
+build_test: $(ODIR)/mips_emul.o $(ODIR)/mips_emul_test.o $(ODIR)/emultest
 
 # builds test files
 $(ODIR)/mips_emul.o: mips_emul.c mips_emul.h
@@ -32,6 +30,6 @@ setup:
 test: $(ODIR)/emultest
 	./$(ODIR)/emultest
 
-
+# removes object files and test file
 clean:
 	rm -f $(ODIR)/*.o $(ODIR)/emultest
