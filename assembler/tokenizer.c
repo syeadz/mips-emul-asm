@@ -163,8 +163,7 @@ TokenType state_to_token_type(State state)
     }
 }
 
-// Main DFA processing function
-Token *tokenize(const char *input, Token *tokens, int *num_tokens)
+void tokenize(const char *input, Token *tokens, int *num_tokens)
 {
     // We start in the START state with the input pointer at the beginning of the input string
     State state = START;
@@ -208,23 +207,3 @@ Token *tokenize(const char *input, Token *tokens, int *num_tokens)
         // printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
     }
 }
-
-// int main()
-// {
-//     const char *input = "add $t0, $t1, $t2\n"
-//                         "sub $t3, $t4, $t5\n"
-//                         "lw $t6, 0($t7)\n"
-//                         "sw $t8, 4($t9)\n"
-//                         "addi $t0, $t1, 0\n"
-//                         "addi $t0, $t1, 100\n"
-//                         "addi $t6, $t7, 0x1A0";
-
-//     Token tokens[MAX_TOKENS];
-//     int num_tokens = 0;
-
-//     tokenize(input, tokens, &num_tokens);
-
-//     printf("Number of tokens: %d\n", num_tokens);
-
-//     return 0;
-// }

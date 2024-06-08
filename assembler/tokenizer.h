@@ -30,4 +30,4 @@ typedef struct
 /// @param tokens 
 /// @param num_tokens 
 /// @return 
-Token *tokenize(const char *input, Token *tokens, int *num_tokens);
+void tokenize(const char *input, Token *tokens, int *num_tokens);
