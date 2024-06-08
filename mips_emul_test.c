@@ -5,6 +5,8 @@ void print_state();
 void print_full();
 void sr(reg_t reg, uint32_t val);
 void sm(uint32_t index, uint32_t val);
+void pr(reg_t reg);
+void pm(uint32_t index);
 
 // pointer to MIPS State
 static StateMIPS *pState;
@@ -87,43 +89,61 @@ MU_TEST(test_0x00_0x20_add)
 {
     // add $t1, $t2, $t3
     // t1 = t2 + t3
-    // 0x014B4820
-    pState->regs[10] = 0x1234;
-    pState->regs[8] = 0x5678;
-    uint32_t instruction = 0x01484820;
-    pState->mem[0] = instruction;
+    // instruction = (0, 10, 11, 9, 0, 0x20)
+    uint32_t instruction = 0x14b4820;
+    sm(0, instruction);
+
+    sr(t2, 0x1234);
+    sr(t3, 0x5678);
 
     EmulateMIPSp(pState);
 
-    mu_assert(pState->regs[9] == 0x1234 + 0x5678, "Add did not work correctly");
+    mu_assert(pState->regs[t1] == 0x1234 + 0x5678, "Add did not work correctly");
 }
 
 // J $addr
 MU_TEST(test_0x02_j)
 {
-    // j 0x1234567
+    // j 0x0A
+    // instruction = (2, 0x0A)
     uint32_t instruction = 0x800000A;
-    pState->mem[0] = instruction;
+    sm(0, instruction);
 
     EmulateMIPSp(pState);
 
     mu_assert(pState->pc == 0x0A, "J did not work correctly");
 }
 
-// BEQ $t1, $t2, 0x1234
+// BEQ $t1, $t2, addr
 MU_TEST(test_0x0c_beq)
 {
-    // beq $t1, $t2, 0x1234
-    // if t1 == t2, pc += 0x1234
-    // 0x014B4820
-    pState->regs[10] = 0x1234;
-    pState->regs[8] = 0x1234;
-    uint32_t instruction = 0x3148000c;
-    pState->mem[0] = instruction;
+    // if t1 == t2, pc += 12
+    // instruction = (0x0C, 9, 10, 0x10)
+    uint32_t instruction = 0x312a0010;
+    sm(0, instruction);
+
+    sr(t1, 0x1234);
+    sr(t2, 0x1234);
 
     EmulateMIPSp(pState);
 
-    mu_assert(pState->pc == 16, "Beq did not work correctly");
+    mu_assert(pState->pc == 20, "Beq did not work correctly");
+}
+
+// LW $t1, offset($t2)
+MU_TEST(test_0x23_lw)
+{
+    // t1 = mem[t2 + 12]
+    // instruction = (0x23, 9, 10, 12)
+    uint32_t instruction = 0x8d49000c;
+    sm(0, instruction);
+
+    sr(t2, 0x10);
+    sm(0x10 + 12, 0x9ABC);
+
+    EmulateMIPSp(pState);
+
+    mu_assert(pState->regs[t1] == 0x9ABC, "Lw did not work correctly");
 }
 
 MU_TEST_SUITE(opcode_tests)
@@ -133,6 +153,7 @@ MU_TEST_SUITE(opcode_tests)
     MU_RUN_TEST(test_0x00_0x20_add);
     MU_RUN_TEST(test_0x02_j);
     MU_RUN_TEST(test_0x0c_beq);
+    MU_RUN_TEST(test_0x23_lw);
 }
 
 int main()
@@ -172,4 +193,18 @@ void sr(reg_t reg, uint32_t val)
 void sm(uint32_t index, uint32_t val)
 {
     pState->mem[index] = val;
+}
+
+/// @brief Prints the value of a register
+/// @param reg the register to be printed
+void pr(reg_t reg)
+{
+    printf("Register %d : %d (%x)\n", reg, pState->regs[reg], pState->regs[reg]);
+}
+
+/// @brief Prints the value at a memory location
+/// @param index index in memory
+void pm(uint32_t index)
+{
+    printf("Memory at %d: %d (%x)\n", index, pState->mem[index], pState->mem[index]);
 }
