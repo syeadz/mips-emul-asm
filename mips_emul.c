@@ -19,18 +19,21 @@ int EmulateMIPSp(StateMIPS *state)
             state->regs[r.rd] = state->regs[r.rs] + state->regs[r.rt];
         break;
 
-    case 0x05: // j
+    case 0x02: // j
         state->pc = j.target;
         break;
+
     case 0x0c: // beq
         if (state->regs[i.rs] == state->regs[i.rt])
         {
             state->pc += i.imm;
         }
         break;
+
     case 0x23: // lw
         state->regs[i.rt] = state->mem[state->regs[i.rs] + i.imm];
         break;
+
     case 0x2b: // sw
         state->mem[state->regs[i.rs] + i.imm] = state->regs[i.rt];
         break;
