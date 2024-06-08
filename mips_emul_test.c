@@ -42,8 +42,21 @@ MU_TEST(test_decode_r_type) {
     mu_assert(r.funct == 0x20, "Funct was not set correctly");
 }
 
+MU_TEST(test_decode_i_type) {
+    // rs = 10, rt = 8, imm = 0x1234
+    // 01010 01000 0001001000110100
+    uint32_t instruction = 0x01481034;
+    i_type i = DecodeIType(instruction);
+
+    // check if flags are correct afterwards
+    mu_assert(i.rs == 10, "RS was not set correctly");
+    mu_assert(i.rt == 8, "RT was not set correctly");
+    mu_assert(i.imm == 0x1034, "Imm was not set correctly");
+}
+
 MU_TEST_SUITE(function_tests) {
     MU_RUN_TEST(test_decode_r_type);
+    MU_RUN_TEST(test_decode_i_type);
 }
 
 int main() {
