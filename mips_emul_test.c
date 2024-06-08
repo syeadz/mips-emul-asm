@@ -54,9 +54,20 @@ MU_TEST(test_decode_i_type) {
     mu_assert(i.imm == 0x1034, "Imm was not set correctly");
 }
 
+MU_TEST(test_decode_j_type) {
+    // target = 0x12345678
+    // 00010010001101010101100101111000
+    uint32_t instruction = 0x12345678;
+    j_type j = DecodeJType(instruction);
+
+    // check if flags are correct afterwards
+    mu_assert(j.target == 0x2345678, "Target was not set correctly");
+}
+
 MU_TEST_SUITE(function_tests) {
     MU_RUN_TEST(test_decode_r_type);
     MU_RUN_TEST(test_decode_i_type);
+    MU_RUN_TEST(test_decode_j_type);
 }
 
 int main() {
