@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <arpa/inet.h>
+
 
 #include "tokenizer.h"
 #include "parser.h"

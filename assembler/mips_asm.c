@@ -27,6 +27,7 @@ char *read_file(const char *filename)
     return buffer;
 }
 
+// This will print the binary representation of the instruction but as a string of 1s and 0s
 void print_binary(FILE *file, uint32_t instruction)
 {
     for (int i = 31; i >= 0; i--)
@@ -36,6 +37,14 @@ void print_binary(FILE *file, uint32_t instruction)
         //     fprintf(file, " "); // Add space for readability TODO remove later
     }
     fprintf(file, "\n");
+}
+
+// This will write the binary representation of the instruction to the file
+void write_binary(FILE *file, uint32_t instruction)
+{
+    // Convert to big-endian before writing NOTE: VERY IMPORTANT!!!
+    uint32_t big_endian_instruction = htonl(instruction);
+    fwrite(&big_endian_instruction, sizeof(uint32_t), 1, file);
 }
 
 void generate_code(AST *ast, const char *output_filename)
@@ -83,7 +92,7 @@ void generate_code(AST *ast, const char *output_filename)
             break;
         }
 
-        print_binary(file, instruction);
+        write_binary(file, instruction);
     }
     fclose(file);
 }
@@ -111,7 +120,6 @@ int main(int argc, char *argv[])
 
     // Free allocated memory.
     free(input);
-    // Free other allocated structures as necessary.
 
     return EXIT_SUCCESS;
 }
