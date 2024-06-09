@@ -82,7 +82,7 @@ void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
     }
 
     fseek(f, 0L, SEEK_END);
-    int fsize = ftell(f);
+    long unsigned fsize = ftell(f);
     fseek(f, 0L, SEEK_SET);
 
     // Allocate buffer for reading
@@ -99,7 +99,7 @@ void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
     fclose(f);
 
     // Convert endianness and copy to memory
-    for (int i = 0; i < fsize / sizeof(uint32_t); i++)
+    for (long unsigned i = 0; i < fsize / sizeof(uint32_t); i++)
     {
         state->mem[offset + i] = __builtin_bswap32(buffer[i]);
     }
