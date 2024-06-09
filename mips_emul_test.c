@@ -117,7 +117,7 @@ MU_TEST(test_0x02_j)
 // BEQ $t1, $t2, addr
 MU_TEST(test_0x0c_beq)
 {
-    // if t1 == t2, pc += 12
+    // if t1 == t2, pc += 16
     // instruction = (0x0C, 9, 10, 0x10)
     uint32_t instruction = 0x312a0010;
     sm(0, instruction);
@@ -127,7 +127,7 @@ MU_TEST(test_0x0c_beq)
 
     EmulateMIPSp(pState);
 
-    mu_assert(pState->pc == 20, "Beq did not work correctly");
+    mu_assert(pState->pc == 17, "Beq did not work correctly");
 }
 
 // LW $t1, offset($t2)
