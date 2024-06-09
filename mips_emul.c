@@ -10,7 +10,8 @@ int EmulateMIPSp(StateMIPS *state)
     j_type j = DecodeJType(instr);
     i_type i = DecodeIType(instr);
 
-    state->pc += sizeof(uint32_t);
+    // TODO: consider using address for PC instead of index
+    state->pc += 1;
 
     switch (opcode)
     {
