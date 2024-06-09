@@ -4,6 +4,9 @@
 # Testing directory
 /testing
 
+# Binary files
+*bin
+
 # Prerequisites
 *.d
 
