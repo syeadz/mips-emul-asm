@@ -66,6 +66,7 @@ int get_register_number(const char *reg)
         return 30;
     if (strcmp(reg, "$ra") == 0)
         return 31;
+    return -1;
 }
 
 int get_opcode(const char *mnemonic)
@@ -80,4 +81,6 @@ int get_opcode(const char *mnemonic)
         return 0x23;
     if (strcmp(mnemonic, "sw") == 0)
         return 0x2b;
+    
+    return -1;
 }
