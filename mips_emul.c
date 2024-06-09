@@ -71,7 +71,6 @@ j_type DecodeJType(uint32_t instruction)
     j.target = instruction & 0x3ffffff;
     return j;
 }
-
 void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
 {
     FILE *f = fopen(filename, "rb");
@@ -80,13 +79,32 @@ void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
         printf("error: Couldn't open %s\n", filename);
         exit(1);
     }
+
     fseek(f, 0L, SEEK_END);
     int fsize = ftell(f);
     fseek(f, 0L, SEEK_SET);
 
-    uint32_t *buffer = &state->mem[offset];
+    // Allocate buffer for reading
+    uint32_t *buffer = malloc(fsize);
+    if (buffer == NULL)
+    {
+        printf("error: Couldn't allocate memory\n");
+        fclose(f);
+        exit(1);
+    }
+
+    // Read the file into the buffer
     fread(buffer, fsize, 1, f);
     fclose(f);
+
+    // Convert endianness and copy to memory
+    for (int i = 0; i < fsize / sizeof(uint32_t); i++)
+    {
+        state->mem[offset + i] = __builtin_bswap32(buffer[i]);
+    }
+
+    // Free the buffer
+    free(buffer);
 }
 
 StateMIPS *InitMIPS(uint32_t mem_size, uint32_t pc_start)
