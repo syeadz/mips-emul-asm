@@ -8,6 +8,9 @@ typedef enum
     IDENTIFIER,
     REGISTER_PREFIX,
     REGISTER,
+    REGISTER_ZERO_E,
+    REGISTER_ZERO_R,
+    REGISTER_ZERO_0,
     ZERO,
     DEC_CONST,
     HEX_PREFIX,
@@ -70,6 +73,20 @@ State next_state(State current, char input)
     case REGISTER:
         if (isdigit(input))
             return REGISTER;
+        // Special case for the zero register
+        if (input == 'e')
+            return REGISTER_ZERO_E;
+        break;
+
+    // Special cases for the zero register
+    case REGISTER_ZERO_E:
+        if (input == 'r')
+            return REGISTER_ZERO_R;
+        break;
+
+    case REGISTER_ZERO_R:
+        if (input == 'o')
+            return REGISTER_ZERO_0;
         break;
 
     // ZERO state is used to classify the number 0, which can be used to represent a zero constant or a hexadecimal constant
@@ -114,6 +131,8 @@ const char *state_to_str(State state)
         return "Identifier";
     case REGISTER:
         return "Register";
+    case REGISTER_ZERO_0:
+        return "Register";
     case ZERO:
         return "Zero";
     case DEC_CONST:
@@ -143,6 +162,8 @@ TokenType state_to_token_type(State state)
     case IDENTIFIER:
         return TOKEN_IDENTIFIER;
     case REGISTER:
+        return TOKEN_REGISTER;
+    case REGISTER_ZERO_0:
         return TOKEN_REGISTER;
     case ZERO:
         return TOKEN_ZERO;
@@ -183,7 +204,7 @@ void tokenize(const char *input, Token *tokens, int *num_tokens)
                 tokens[*num_tokens].type = state_to_token_type(state);
                 tokens[*num_tokens].value = strndup(token_start, input - token_start);
                 (*num_tokens)++;
-                // printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
+                printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
             }
             // Update the token start pointer and the state
             token_start = input + (next == WHITESPACE ? 1 : 0);
@@ -204,6 +225,6 @@ void tokenize(const char *input, Token *tokens, int *num_tokens)
         tokens[*num_tokens].type = state_to_token_type(state);
         tokens[*num_tokens].value = strndup(token_start, input - token_start);
         (*num_tokens)++;
-        // printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
+        printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
     }
 }
