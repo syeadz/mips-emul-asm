@@ -190,6 +190,8 @@ void tokenize(const char *input, Token *tokens, int *num_tokens)
     State state = START;
     const char *token_start = input;
 
+    int token_num = 0;
+
     // While we haven't reached the end of the input string
     while (*input)
     {
@@ -204,7 +206,8 @@ void tokenize(const char *input, Token *tokens, int *num_tokens)
                 tokens[*num_tokens].type = state_to_token_type(state);
                 tokens[*num_tokens].value = strndup(token_start, input - token_start);
                 (*num_tokens)++;
-                printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
+                printf("Token %d: %.*s, Type: %s\n", token_num, (int)(input - token_start), token_start, state_to_str(state));
+                token_num++;
             }
             // Update the token start pointer and the state
             token_start = input + (next == WHITESPACE ? 1 : 0);
@@ -225,6 +228,6 @@ void tokenize(const char *input, Token *tokens, int *num_tokens)
         tokens[*num_tokens].type = state_to_token_type(state);
         tokens[*num_tokens].value = strndup(token_start, input - token_start);
         (*num_tokens)++;
-        printf("Token: %.*s, Type: %s\n", (int)(input - token_start), token_start, state_to_str(state));
+        printf("Token %d: %.*s, Type: %s\n", token_num, (int)(input - token_start), token_start, state_to_str(state));
     }
 }
