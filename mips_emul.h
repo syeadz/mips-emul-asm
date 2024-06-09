@@ -74,6 +74,7 @@ typedef struct StateMIPS
     uint32_t regs[32];
 
     // program counter
+    // NOTE: This is the index in the memory array, not the address in memory
     uint32_t pc;
 
     // pointer to program in memory
@@ -120,6 +121,9 @@ i_type DecodeIType(uint32_t instruction);
 j_type DecodeJType(uint32_t instruction);
 
 /// @brief Read a file into memory at a specific offset
+/// NOTE: This function assumes the file is a binary file
+/// Also, the offset is used like mem[offset] = file[0], mem[offset+1] = file[1], etc.
+/// As such, the offset does not mean address in memory, but rather the index in the memory array.
 /// @param state
 /// @param filename
 /// @param offset
