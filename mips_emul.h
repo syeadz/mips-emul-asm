@@ -53,7 +53,7 @@ typedef enum registers
 
 typedef enum exception_codes
 {
-    Int = 0, // interrupt
+    Int = 0,  // interrupt
     AdEL = 4, // address error exception (load or instruction fetch)
     AdES = 5, // address error exception (store)
     IBE = 6,  // bus error on instruction fetch
@@ -126,9 +126,14 @@ j_type DecodeJType(uint32_t instruction);
 void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset);
 
 /// @brief Initialize the MIPS processor
-/// @param
-/// @return
-StateMIPS *InitMIPS(void);
+/// @param mem_size
+/// @param pc_start
+/// @return StateMIPS*
+StateMIPS *InitMIPS(uint32_t mem_size, uint32_t pc_start);
+
+/// @brief Free the MIPS processor
+/// @param state
+void FreeMIPS(StateMIPS *state);
 
 /// @brief Emulate the MIPS processor
 /// @param state
