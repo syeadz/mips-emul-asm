@@ -10,6 +10,8 @@
 # Executable files
 asm
 main
+instr_to_num
+num_to_instr
 
 # Prerequisites
 *.d
