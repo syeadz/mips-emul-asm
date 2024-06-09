@@ -7,6 +7,10 @@
 # Binary files
 *bin
 
+# Executable files
+asm
+main
+
 # Prerequisites
 *.d
 
