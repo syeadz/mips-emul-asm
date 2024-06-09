@@ -92,12 +92,12 @@ int main(int argc, char *argv[])
 {
     if (argc != 3)
     {
-        // fprintf(stderr, "Usage: %s <input file> <output file>\n", argv[0]);
-        // return EXIT_FAILURE;
+        fprintf(stderr, "Usage: %s <input file> <output file>\n", argv[0]);
+        return EXIT_FAILURE;
     }
 
-    const char *input_filename = "test.asm";
-    const char *output_filename = "test.out";
+    const char *input_filename = argv[1];
+    const char *output_filename = argv[2];
 
     Token tokens[MAX_TOKENS];
     int token_count = 0;
