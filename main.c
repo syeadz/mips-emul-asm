@@ -26,6 +26,7 @@ int main()
         }
 
         print_pc(win, state);
+        print_current_instr(win, state);
         print_registers(win, state);
         print_memory(win, state);
         wrefresh(win);

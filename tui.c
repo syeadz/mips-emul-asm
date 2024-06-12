@@ -45,8 +45,6 @@ void jump_to_instruction(WINDOW *win, StateMIPS *state)
     state->pc = address;
     mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address);
 
-
-
     print_memory(win, state);
     wrefresh(win);
 }
@@ -67,10 +65,7 @@ void jump_to_memory(WINDOW *win)
         return;
     }
 
-    if (address > memory_address + MEM_VIEW_SIZE || address < memory_address)
-    {
-        memory_address = address;
-    }
+    memory_address = address;
 
     mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address);
     wrefresh(win);
@@ -153,17 +148,31 @@ int handle_input(WINDOW *win, StateMIPS *state)
     case 'q':
     case 'Q':
         return -1;
-    case 'w':
-        memory_address += MEM_VIEW_STEP;
-        print_memory(win, state);
+    case 's':
+        if (memory_address + MEM_VIEW_SIZE >= MEM_SIZE)
+        {
+            memory_address = MEM_SIZE - MEM_VIEW_SIZE;
+        }
+        else
+        {
+            memory_address += MEM_VIEW_STEP;
+        }
         mvwprintw(win, OUTPUT_LINE, 1, "Moved up, memory address: %d", memory_address);
         return 0;
-    case 's':
-        memory_address -= MEM_VIEW_STEP;
-        print_memory(win, state);
+    case 'w':
+        if (memory_address - MEM_VIEW_STEP < 0)
+        {
+            memory_address = 0;
+        }
+        else
+        {
+            memory_address -= MEM_VIEW_STEP;
+        }
         mvwprintw(win, OUTPUT_LINE, 1, "Moved down, memory address: %d", memory_address);
         return 0;
     }
+
+    return 0;
 }
 
 void print_registers(WINDOW *win, StateMIPS *state)
@@ -171,7 +180,7 @@ void print_registers(WINDOW *win, StateMIPS *state)
     mvwprintw(win, REG_ROW_LOC, REG_COL_LOC, "Registers:");
     for (int i = 0; i < 32; i++)
     {
-        mvwprintw(win, i + REG_ROW_LOC + 1, REG_COL_LOC, "$%02d: 0x%08x", i, state->regs[i]);
+        mvwprintw(win, i + REG_ROW_LOC + 1, REG_COL_LOC, "$%s:\t 0x%08x", GetRegName(i), state->regs[i]);
     }
 }
 
@@ -182,7 +191,7 @@ void print_memory(WINDOW *win, StateMIPS *state)
     {
         memory_address = 0;
     }
-    if (memory_address + MEM_VIEW_SIZE >= MEM_SIZE || memory_address > MEM_SIZE)
+    else if (memory_address + MEM_VIEW_SIZE >= MEM_SIZE || memory_address > MEM_SIZE)
     {
         memory_address = MEM_SIZE - MEM_VIEW_SIZE;
     }
@@ -198,15 +207,54 @@ void print_memory(WINDOW *win, StateMIPS *state)
         if (memory_address + i == state->pc)
         {
             wattron(win, COLOR_PAIR(1));
-            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x: 0x%08x", memory_address + i*4, state->mem[memory_address + i]);
+            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", memory_address + i * 4, state->mem[memory_address + i]);
             wattroff(win, COLOR_PAIR(1));
-        } else {
-            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x: 0x%08x", memory_address + i*4, state->mem[memory_address + i]);
         }
+        else
+        {
+            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", memory_address + i * 4, state->mem[memory_address + i]);
+        }
+    }
+}
+
+void print_current_instr(WINDOW *win, StateMIPS *state)
+{
+    uint32_t instr = state->mem[state->pc];
+
+    wmove(win, 1, MEM_COL_LOC);
+    wclrtoeol(win);
+
+    if (instr == 0)
+    {
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: not an instruction");
+        return;
+    }
+
+    instr_t i = DecodeInstruction(instr);
+
+    const char *mnemonic = get_mnemonic(instr);
+
+    switch (i.format)
+    {
+    case R_rd_rs_rt:
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, $%s", mnemonic, GetRegName(i.r.rd), GetRegName(i.r.rs), GetRegName(i.r.rt));
+        break;
+    case I_rs_rt_i:
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, 0x%04x", mnemonic, GetRegName(i.i.rs), GetRegName(i.i.rt), i.i.imm);
+        break;
+    case I_rt_i_rs:
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, 0x%04x($%s)", mnemonic, GetRegName(i.i.rt), i.i.imm, GetRegName(i.i.rs));
+        break;
+    case J_i:
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s 0x%08x", mnemonic, GetRegName(i.j.target));
+        break;
+    default:
+        mvwprintw(win, 1, MEM_COL_LOC, "Invalid or unrecognized instruction");
+        break;
     }
 }
 
 void print_pc(WINDOW *win, StateMIPS *state)
 {
-    mvwprintw(win, 1, 1, "PC: 0x%08x", state->pc);
+    mvwprintw(win, REG_COL_LOC, 1, "PC: 0x%08x", state->pc);
 }

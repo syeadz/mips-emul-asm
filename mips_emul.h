@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "utils.h"
+
 // Useful bitwise macros
 
 #define BIT_MASK(bit_pos) (1 << (bit))
@@ -83,45 +85,6 @@ typedef struct StateMIPS
     // pointer to program in memory
     uint32_t *mem;
 } StateMIPS;
-
-/// @brief Struct to hold r-type instruction
-typedef struct r_type
-{
-    uint8_t rs;
-    uint8_t rt;
-    uint8_t rd;
-    uint8_t shamt;
-    uint8_t funct;
-} r_type;
-
-/// @brief Struct to hold i-type instruction
-typedef struct i_type
-{
-    uint8_t rs;
-    uint8_t rt;
-    uint16_t imm;
-} i_type;
-
-/// @brief Struct to hold j-type instruction
-typedef struct j_type
-{
-    uint32_t target;
-} j_type;
-
-/// @brief Decode an R-type instruction
-/// @param instruction
-/// @return r_type
-r_type DecodeRType(uint32_t instruction);
-
-/// @brief Decode an I-type instruction
-/// @param instruction
-/// @return i_type
-i_type DecodeIType(uint32_t instruction);
-
-/// @brief Decode a J-type instruction
-/// @param instruction
-/// @return j_type
-j_type DecodeJType(uint32_t instruction);
 
 /// @brief Read a file into memory at a specific offset
 /// NOTE: This function assumes the file is a binary file

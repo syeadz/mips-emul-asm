@@ -39,6 +39,11 @@ void print_memory(WINDOW *win, StateMIPS *state);
 /// @param state
 void print_pc(WINDOW *win, StateMIPS *state);
 
+/// @brief Prints the current instruction.
+/// @param win
+/// @param state
+void print_current_instr(WINDOW *win, StateMIPS *state);
+
 /// @brief Displays the help menu.
 /// @param win
 void print_help(WINDOW *win);

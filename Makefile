@@ -25,16 +25,19 @@ $(ODIR)/main.o: main.c mips_emul.h mips_emul.c
 $(ODIR)/mips_emul.o: mips_emul.c mips_emul.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(ODIR)/tui.o: tui.c tui.h
+$(ODIR)/tui.o: tui.c tui.h utils.h utils.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-main: $(ODIR)/mips_emul.o $(ODIR)/tui.o $(ODIR)/main.o
+$(ODIR)/utils.o: utils.c utils.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+main: $(ODIR)/mips_emul.o $(ODIR)/tui.o $(ODIR)/utils.o $(ODIR)/main.o
 	$(CC) -o $@ $^ $(CFLAGS) $(TUI_LIBS)
 
 $(ODIR)/mips_emul_test.o: mips_emul_test.c mips_emul.h minunit.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(ODIR)/emultest: $(ODIR)/mips_emul.o $(ODIR)/mips_emul_test.o
+$(ODIR)/emultest: $(ODIR)/mips_emul.o $(ODIR)/mips_emul_test.o $(ODIR)/utils.o
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 # create build directory
