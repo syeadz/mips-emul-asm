@@ -2,8 +2,13 @@
 
 #include "mips_emul.h"
 
-#include <curses.h>
-
+// Include the correct curses header based on the operating system
+#ifdef _WIN32
+    #include <curses.h>
+    #include <panel.h>
+#else
+    #include <ncurses.h>
+#endif
 
 #define REG_ROW_LOC 3
 #define MEM_ROW_LOC 3

@@ -6,7 +6,13 @@ ODIR = build
 
 # no libraries required currently
 LIBS =
-TUI_LIBS = -lncurses
+
+# check if OS is Windows_NT to use pdcurses instead of ncurses
+ifeq ($(OS),Windows_NT)
+    TUI_LIBS = -lpdcurses
+else
+    TUI_LIBS = -lncurses
+endif
 
 .PHONY: all build build_test test clean setup run
 
