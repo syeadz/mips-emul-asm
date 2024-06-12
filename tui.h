@@ -11,8 +11,8 @@
 #define MEM_COL_LOC 40
 
 
-#define MEM_VIEW_SIZE 33
-#define MEM_VIEW_STEP 1
+#define MEM_VIEW_SIZE 32
+#define MEM_VIEW_STEP 4
 
 #define OUTPUT_LINE 40
 

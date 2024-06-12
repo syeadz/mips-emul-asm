@@ -45,7 +45,8 @@ void jump_to_instruction(WINDOW *win, StateMIPS *state)
     state->pc = address;
     mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address);
 
-    memory_address = address;
+
+
     print_memory(win, state);
     wrefresh(win);
 }
@@ -66,7 +67,11 @@ void jump_to_memory(WINDOW *win)
         return;
     }
 
-    memory_address = address;
+    if (address > memory_address + MEM_VIEW_SIZE || address < memory_address)
+    {
+        memory_address = address;
+    }
+
     mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address);
     wrefresh(win);
 }
@@ -105,7 +110,11 @@ void load_file(WINDOW *win, StateMIPS *state)
         mvwprintw(win, OUTPUT_LINE, 1, "Error loading file");
     }
 
-    memory_address = address;
+    if (address > memory_address + MEM_VIEW_SIZE || address < memory_address)
+    {
+        memory_address = address;
+    }
+
     print_memory(win, state);
     wrefresh(win);
 }
@@ -113,9 +122,9 @@ void load_file(WINDOW *win, StateMIPS *state)
 void print_help(WINDOW *win)
 {
     mvwprintw(win, OUTPUT_LINE, 1, "n: Next instruction");
-    mvwprintw(win, OUTPUT_LINE + 1, 1, "j: Jump to instruction");
-    mvwprintw(win, OUTPUT_LINE + 2, 1, "m: Jump to memory");
-    mvwprintw(win, OUTPUT_LINE + 3, 1, "l: Load file");
+    mvwprintw(win, OUTPUT_LINE + 1, 1, "l: Load file");
+    mvwprintw(win, OUTPUT_LINE + 2, 1, "j: Jump to instruction");
+    mvwprintw(win, OUTPUT_LINE + 3, 1, "m: Jump to memory");
     mvwprintw(win, OUTPUT_LINE + 4, 1, "h: Help");
     mvwprintw(win, OUTPUT_LINE + 5, 1, "q: Quit");
     wrefresh(win);
