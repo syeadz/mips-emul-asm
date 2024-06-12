@@ -1,24 +1,40 @@
 #include "mips_emul.h"
+#include "tui.h"
 
-int main(int argc, char **argv)
+int main()
 {
-    // if (argc != 2)
-    // {
-    //     printf("usage: %s <filename>\n", argv[0]);
-    //     exit(1);
-    // }
+    // ncurses options
+    initscr(); /* Start curses mode 		  */
+    curs_set(0);
+    noecho();
+    start_color();
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK);
+
+    StateMIPS *state = InitMIPS(0x0);
+
+    WINDOW *win = create_win(50, 160, 0, 0);
+
+    int op = 0;
+    int ret = 0;
     
-    int done = 0;
-    StateMIPS *state = InitMIPS(0x10000, 0x0);
-
-    ReadFileIntoMemoryAt(state, "add.bin", 0);
-    ReadFileIntoMemoryAt(state, "mem.bin", 0xc);
-
-    while (done == 0)
+    print_help(win);
+    do
     {
-        done = EmulateMIPSp(state);
-    }
+        if (op == 1)
+        {
+            ret = EmulateMIPSp(state);
+        }
+
+        print_pc(win, state);
+        print_registers(win, state);
+        print_memory(win, state);
+        wrefresh(win);
+
+        op = handle_input(win, state);
+    } while (op != -1);
 
     FreeMIPS(state);
+
+    endwin(); /* End curses mode		  */
     return 0;
 }

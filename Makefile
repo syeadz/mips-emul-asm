@@ -5,14 +5,15 @@ CFLAGS = -g -Wall -Wextra
 ODIR = build
 
 # no libraries required currently
-LIBS = 
+LIBS =
+TUI_LIBS = -lncurses
 
-.PHONY: all build build_test test clean setup
+.PHONY: all build build_test test clean setup run
 
 all: build build_test
 
 # builds main program
-build: $(ODIR)/mips_emul.o $(ODIR)/main.o main
+build: $(ODIR)/mips_emul.o $(ODIR)/tui.o $(ODIR)/main.o main
 
 # builds test for mips_emul
 build_test: $(ODIR)/mips_emul.o $(ODIR)/mips_emul_test.o $(ODIR)/emultest
@@ -24,8 +25,11 @@ $(ODIR)/main.o: main.c mips_emul.h mips_emul.c
 $(ODIR)/mips_emul.o: mips_emul.c mips_emul.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-main: $(ODIR)/mips_emul.o $(ODIR)/main.o
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+$(ODIR)/tui.o: tui.c tui.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+main: $(ODIR)/mips_emul.o $(ODIR)/tui.o $(ODIR)/main.o
+	$(CC) -o $@ $^ $(CFLAGS) $(TUI_LIBS)
 
 $(ODIR)/mips_emul_test.o: mips_emul_test.c mips_emul.h minunit.h
 	$(CC) -c -o $@ $< $(CFLAGS)
@@ -36,6 +40,9 @@ $(ODIR)/emultest: $(ODIR)/mips_emul.o $(ODIR)/mips_emul_test.o
 # create build directory
 setup:
 	mkdir -p $(ODIR)
+
+run: main
+	./main
 
 # runs test file
 test: $(ODIR)/emultest
