@@ -72,13 +72,14 @@ j_type DecodeJType(uint32_t instruction)
     j.target = instruction & 0x3ffffff;
     return j;
 }
-void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
+
+int ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
 {
     FILE *f = fopen(filename, "rb");
     if (f == NULL)
     {
         printf("error: Couldn't open %s\n", filename);
-        exit(1);
+        return 1;
     }
 
     fseek(f, 0L, SEEK_END);
@@ -89,9 +90,9 @@ void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
     uint32_t *buffer = malloc(fsize);
     if (buffer == NULL)
     {
-        printf("error: Couldn't allocate memory\n");
+        printf("error: Couldn't allocate buffer for %s\n", filename);
         fclose(f);
-        exit(1);
+        return 1;
     }
 
     // Read the file into the buffer
@@ -106,6 +107,7 @@ void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
 
     // Free the buffer
     free(buffer);
+    return 0;
 }
 
 StateMIPS *InitMIPS(uint32_t pc_start)

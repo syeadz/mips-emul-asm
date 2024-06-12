@@ -130,7 +130,8 @@ j_type DecodeJType(uint32_t instruction);
 /// @param state
 /// @param filename
 /// @param offset
-void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset);
+/// @return returns 0 on success, 1 on failure
+int ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset);
 
 /// @brief Initialize the MIPS processor
 /// @param pc_start
