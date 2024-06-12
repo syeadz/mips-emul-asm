@@ -14,6 +14,9 @@
 // Test if a bit is set
 #define TEST_BIT(variable, bit_pos) (((variable) & BIT_MASK(bit_pos)) ? 1 : 0)
 
+// This is the size of the memory in bytes
+#define MEM_SIZE 0x1000
+
 // MIPS registers, use as index into the regs array in StateMIPS
 typedef enum registers
 {
@@ -130,10 +133,9 @@ j_type DecodeJType(uint32_t instruction);
 void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset);
 
 /// @brief Initialize the MIPS processor
-/// @param mem_size
 /// @param pc_start
 /// @return StateMIPS*
-StateMIPS *InitMIPS(uint32_t mem_size, uint32_t pc_start);
+StateMIPS *InitMIPS(uint32_t pc_start);
 
 /// @brief Free the MIPS processor
 /// @param state

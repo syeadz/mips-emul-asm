@@ -108,10 +108,10 @@ void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
     free(buffer);
 }
 
-StateMIPS *InitMIPS(uint32_t mem_size, uint32_t pc_start)
+StateMIPS *InitMIPS(uint32_t pc_start)
 {
     StateMIPS *state = calloc(1, sizeof(StateMIPS));
-    state->mem = malloc(mem_size); // change to 2^32 for full 4GB address space
+    state->mem = malloc(MEM_SIZE); // change to 2^32 for full 4GB address space
     state->pc = pc_start;
     return state;
 }
