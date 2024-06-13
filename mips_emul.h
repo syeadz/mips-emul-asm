@@ -78,8 +78,7 @@ typedef struct StateMIPS
     // MIPS registers
     uint32_t regs[32];
 
-    // program counter
-    // NOTE: This is the index in the memory array, not the address in memory
+    // program counter, holds the address (not index) of the current instruction
     uint32_t pc;
 
     // pointer to program in memory

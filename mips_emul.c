@@ -2,16 +2,19 @@
 
 int EmulateMIPSp(StateMIPS *state)
 {
+    // If keeping track of cycles
     // int cycles = 1;
-    uint32_t instr = state->mem[state->pc];
+
+    // Get instruction from memory, divide by 4 to get index from address
+    uint32_t instr = state->mem[(state->pc) / 4];
     uint8_t opcode = (instr >> 26) & 0x3F;
 
     r_type r = DecodeRType(instr);
     j_type j = DecodeJType(instr);
     i_type i = DecodeIType(instr);
 
-    // TODO: consider using address for PC instead of index
-    state->pc += 1;
+    // Increment by 4 bytes (32 bits) to point to next instruction
+    state->pc += 4;
 
     switch (opcode)
     {
@@ -32,11 +35,11 @@ int EmulateMIPSp(StateMIPS *state)
         break;
 
     case 0x23: // lw
-        state->regs[i.rt] = state->mem[state->regs[i.rs] + i.imm];
+        state->regs[i.rt] = state->mem[(state->regs[i.rs] + i.imm)/4];
         break;
 
     case 0x2b: // sw
-        state->mem[state->regs[i.rs] + i.imm] = state->regs[i.rt];
+        state->mem[(state->regs[i.rs] + i.imm)/4] = state->regs[i.rt];
         break;
     }
 
