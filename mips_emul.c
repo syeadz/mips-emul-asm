@@ -72,7 +72,7 @@ int ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
     // Convert endianness and copy to memory
     for (long unsigned i = 0; i < fsize / sizeof(uint32_t); i++)
     {
-        state->mem[offset + i] = __builtin_bswap32(buffer[i]);
+        state->mem[offset/4 + i] = __builtin_bswap32(buffer[i]);
     }
 
     // Free the buffer

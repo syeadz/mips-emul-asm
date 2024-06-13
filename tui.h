@@ -10,15 +10,19 @@
     #include <ncurses.h>
 #endif
 
+// Define the locations of the registers and memory in the window
 #define REG_ROW_LOC 3
 #define MEM_ROW_LOC 3
 #define REG_COL_LOC 1
 #define MEM_COL_LOC 40
 
 
+// Size of the memory view, these many memory locations will be displayed
 #define MEM_VIEW_SIZE 32
+// Move by 4 bytes at a time when scrolling through memory
 #define MEM_VIEW_STEP 4
 
+// Output line for messages
 #define OUTPUT_LINE 40
 
 /// @brief Creates a new window based on parameters.

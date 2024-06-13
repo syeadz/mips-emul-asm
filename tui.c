@@ -1,5 +1,6 @@
 #include "tui.h"
 
+/// @brief The memory address to display.
 int memory_address = 0;
 
 /**
@@ -27,9 +28,9 @@ void clear_output(WINDOW *win)
 }
 
 /// @brief Checks if the address is valid and a multiple of 4.
-/// @param win 
-/// @param address 
-/// @return Returns the address divided by 4 if valid, -1 otherwise.
+/// @param win
+/// @param address
+/// @return
 int address_check(WINDOW *win, int address)
 {
     if (address % 4 != 0)
@@ -45,9 +46,8 @@ int address_check(WINDOW *win, int address)
         return -1;
     }
 
-    return address / 4;
+    return address;
 }
-
 
 void jump_to_instruction(WINDOW *win, StateMIPS *state)
 {
@@ -64,7 +64,7 @@ void jump_to_instruction(WINDOW *win, StateMIPS *state)
         return;
 
     state->pc = address;
-    mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address * 4);
+    mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address);
 
     print_memory(win, state);
     wrefresh(win);
@@ -86,7 +86,7 @@ void jump_to_memory(WINDOW *win)
 
     memory_address = address;
 
-    mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address * 4);
+    mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address);
     wrefresh(win);
 }
 
@@ -115,14 +115,15 @@ void load_file(WINDOW *win, StateMIPS *state)
     int res = ReadFileIntoMemoryAt(state, filename, address);
     if (res == 0)
     {
-        mvwprintw(win, OUTPUT_LINE, 1, "File %s loaded successfully at 0x%08x", filename, address * 4);
+        mvwprintw(win, OUTPUT_LINE, 1, "File %s loaded successfully at 0x%08x", filename, address);
     }
     else
     {
         mvwprintw(win, OUTPUT_LINE, 1, "Error loading file");
     }
 
-    if (address > memory_address + MEM_VIEW_SIZE || address < memory_address)
+    // Check if the memory address is within the view, if not, update it
+    if (address > memory_address + MEM_VIEW_SIZE * 4 || address < memory_address)
     {
         memory_address = address;
     }
@@ -166,26 +167,14 @@ int handle_input(WINDOW *win, StateMIPS *state)
     case 'Q':
         return -1;
     case 's':
-        if (memory_address + MEM_VIEW_SIZE >= MEM_SIZE)
-        {
-            memory_address = MEM_SIZE - MEM_VIEW_SIZE;
-        }
-        else
-        {
-            memory_address += MEM_VIEW_STEP;
-        }
-        mvwprintw(win, OUTPUT_LINE, 1, "Moved up, memory address: 0x%08x", memory_address * 4);
+        // Change the memory address to the next 4 bytes if possible
+        memory_address += MEM_VIEW_STEP;
+        mvwprintw(win, OUTPUT_LINE, 1, "Moved down, memory address: 0x%08x", memory_address);
         return 0;
     case 'w':
-        if (memory_address - MEM_VIEW_STEP < 0)
-        {
-            memory_address = 0;
-        }
-        else
-        {
-            memory_address -= MEM_VIEW_STEP;
-        }
-        mvwprintw(win, OUTPUT_LINE, 1, "Moved down, memory address: 0x%08x", memory_address * 4);
+        // Change the memory address to the previous 4 bytes if possible
+        memory_address -= MEM_VIEW_STEP;
+        mvwprintw(win, OUTPUT_LINE, 1, "Moved up, memory address: 0x%08x", memory_address);
         return 0;
     }
 
@@ -210,26 +199,23 @@ void print_memory(WINDOW *win, StateMIPS *state)
     }
     else if (memory_address + MEM_VIEW_SIZE * 4 >= MEM_SIZE || memory_address > MEM_SIZE)
     {
-        memory_address = MEM_SIZE - MEM_VIEW_SIZE;
+        memory_address = MEM_SIZE - MEM_VIEW_SIZE * 4;
     }
 
     mvwprintw(win, MEM_ROW_LOC, MEM_COL_LOC, "Memory:");
 
     for (int i = 0; i < MEM_VIEW_SIZE; i++)
     {
-        if (i >= MEM_SIZE)
-        {
-            break;
-        }
-        if (memory_address + i == state->pc)
+        // Highlight the current instruction
+        if (memory_address + i * 4 == state->pc)
         {
             wattron(win, COLOR_PAIR(1));
-            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", memory_address + i * 4, state->mem[memory_address + i]);
+            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", memory_address + i * 4, state->mem[memory_address / 4 + i]);
             wattroff(win, COLOR_PAIR(1));
         }
         else
         {
-            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", memory_address + i * 4, state->mem[memory_address + i]);
+            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", memory_address + i * 4, state->mem[memory_address / 4 + i]);
         }
     }
 }
