@@ -26,24 +26,45 @@ void clear_output(WINDOW *win)
     wrefresh(win);
 }
 
-void jump_to_instruction(WINDOW *win, StateMIPS *state)
+/// @brief Checks if the address is valid and a multiple of 4.
+/// @param win 
+/// @param address 
+/// @return Returns the address divided by 4 if valid, -1 otherwise.
+int address_check(WINDOW *win, int address)
 {
-    int address;
-    echo();
-    mvwprintw(win, OUTPUT_LINE, 1, "Enter address: ");
-    wrefresh(win);
-    wscanw(win, "%x", &address);
-    noecho();
-
+    if (address % 4 != 0)
+    {
+        mvwprintw(win, OUTPUT_LINE, 1, "Address must be a multiple of 4");
+        wrefresh(win);
+        return -1;
+    }
     if (address < 0 || address > MEM_SIZE)
     {
         mvwprintw(win, OUTPUT_LINE, 1, "Invalid address");
         wrefresh(win);
-        return;
+        return -1;
     }
 
+    return address / 4;
+}
+
+
+void jump_to_instruction(WINDOW *win, StateMIPS *state)
+{
+    int address;
+    echo();
+    mvwprintw(win, OUTPUT_LINE, 1, "Enter address (hex): ");
+    wrefresh(win);
+    wscanw(win, "%x", &address);
+    noecho();
+
+    address = address_check(win, address);
+
+    if (address == -1)
+        return;
+
     state->pc = address;
-    mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address);
+    mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address * 4);
 
     print_memory(win, state);
     wrefresh(win);
@@ -53,21 +74,19 @@ void jump_to_memory(WINDOW *win)
 {
     int address;
     echo();
-    mvwprintw(win, OUTPUT_LINE, 1, "Enter address: ");
+    mvwprintw(win, OUTPUT_LINE, 1, "Enter address (hex): ");
     wrefresh(win);
     wscanw(win, "%x", &address);
     noecho();
 
-    if (address < 0 || address > MEM_SIZE)
-    {
-        mvwprintw(win, OUTPUT_LINE, 1, "Invalid address");
-        wrefresh(win);
+    address = address_check(win, address);
+
+    if (address == -1)
         return;
-    }
 
     memory_address = address;
 
-    mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address);
+    mvwprintw(win, OUTPUT_LINE, 1, "Jumped to address 0x%08x", address * 4);
     wrefresh(win);
 }
 
@@ -82,23 +101,21 @@ void load_file(WINDOW *win, StateMIPS *state)
     wgetnstr(win, filename, 100);
     clear_output(win);
 
-    mvwprintw(win, OUTPUT_LINE, 1, "Enter address: ");
+    mvwprintw(win, OUTPUT_LINE, 1, "Enter address (hex): ");
     wrefresh(win);
     wscanw(win, "%x", &address);
     noecho();
     clear_output(win);
 
-    if (address < 0 || address > MEM_SIZE)
-    {
-        mvwprintw(win, OUTPUT_LINE, 1, "Invalid address");
-        wrefresh(win);
+    address = address_check(win, address);
+
+    if (address == -1)
         return;
-    }
 
     int res = ReadFileIntoMemoryAt(state, filename, address);
     if (res == 0)
     {
-        mvwprintw(win, OUTPUT_LINE, 1, "File %s loaded successfully at %x", filename, address);
+        mvwprintw(win, OUTPUT_LINE, 1, "File %s loaded successfully at 0x%08x", filename, address * 4);
     }
     else
     {
@@ -157,7 +174,7 @@ int handle_input(WINDOW *win, StateMIPS *state)
         {
             memory_address += MEM_VIEW_STEP;
         }
-        mvwprintw(win, OUTPUT_LINE, 1, "Moved up, memory address: %d", memory_address);
+        mvwprintw(win, OUTPUT_LINE, 1, "Moved up, memory address: 0x%08x", memory_address * 4);
         return 0;
     case 'w':
         if (memory_address - MEM_VIEW_STEP < 0)
@@ -168,7 +185,7 @@ int handle_input(WINDOW *win, StateMIPS *state)
         {
             memory_address -= MEM_VIEW_STEP;
         }
-        mvwprintw(win, OUTPUT_LINE, 1, "Moved down, memory address: %d", memory_address);
+        mvwprintw(win, OUTPUT_LINE, 1, "Moved down, memory address: 0x%08x", memory_address * 4);
         return 0;
     }
 
@@ -191,7 +208,7 @@ void print_memory(WINDOW *win, StateMIPS *state)
     {
         memory_address = 0;
     }
-    else if (memory_address + MEM_VIEW_SIZE >= MEM_SIZE || memory_address > MEM_SIZE)
+    else if (memory_address + MEM_VIEW_SIZE * 4 >= MEM_SIZE || memory_address > MEM_SIZE)
     {
         memory_address = MEM_SIZE - MEM_VIEW_SIZE;
     }
