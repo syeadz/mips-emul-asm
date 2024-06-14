@@ -32,6 +32,7 @@ int main()
         wrefresh(win);
 
         op = handle_input(win, state);
+        wclear(win);
     } while (op != -1);
 
     free_mips(state);
