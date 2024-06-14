@@ -1,6 +1,6 @@
 #include "mips_emul.h"
 
-int EmulateMIPSp(StateMIPS *state)
+int emulate_mips(StateMIPS *state)
 {
     // If keeping track of cycles
     // int cycles = 1;
@@ -9,9 +9,9 @@ int EmulateMIPSp(StateMIPS *state)
     uint32_t instr = state->mem[state->pc / 4];
     uint8_t opcode = (instr >> 26) & 0x3F;
 
-    r_type r = DecodeRType(instr);
-    j_type j = DecodeJType(instr);
-    i_type i = DecodeIType(instr);
+    RType r = decode_r_type(instr);
+    JType j = decode_j_type(instr);
+    IType i = decode_i_type(instr);
 
     // Increment by 4 bytes (32 bits) to point to next instruction
     state->pc += 4;
@@ -46,7 +46,7 @@ int EmulateMIPSp(StateMIPS *state)
     return 0;
 }
 
-int ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
+int read_file_into_mem_at(StateMIPS *state, char *filename, uint32_t offset)
 {
     FILE *f = fopen(filename, "rb");
     if (f == NULL)
@@ -83,7 +83,7 @@ int ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
     return 0;
 }
 
-StateMIPS *InitMIPS(uint32_t pc_start)
+StateMIPS *init_mips(uint32_t pc_start)
 {
     StateMIPS *state = calloc(1, sizeof(StateMIPS));
     state->mem = malloc(MEM_SIZE); // change to 2^32 for full 4GB address space
@@ -91,7 +91,7 @@ StateMIPS *InitMIPS(uint32_t pc_start)
     return state;
 }
 
-void FreeMIPS(StateMIPS *state)
+void free_mips(StateMIPS *state)
 {
     free(state->mem);
     free(state);

@@ -112,7 +112,7 @@ void load_file(WINDOW *win, StateMIPS *state)
     if (address == -1)
         return;
 
-    int res = ReadFileIntoMemoryAt(state, filename, address);
+    int res = read_file_into_mem_at(state, filename, address);
     if (res == 0)
     {
         mvwprintw(win, OUTPUT_LINE, 1, "File %s loaded successfully at 0x%08x", filename, address);
@@ -186,7 +186,7 @@ void print_registers(WINDOW *win, StateMIPS *state)
     mvwprintw(win, REG_ROW_LOC, REG_COL_LOC, "Registers:");
     for (int i = 0; i < 32; i++)
     {
-        mvwprintw(win, i + REG_ROW_LOC + 1, REG_COL_LOC, "$%s:\t 0x%08x", GetRegName(i), state->regs[i]);
+        mvwprintw(win, i + REG_ROW_LOC + 1, REG_COL_LOC, "$%s:\t 0x%08x", get_reg_name(i), state->regs[i]);
     }
 }
 
@@ -233,23 +233,23 @@ void print_current_instr(WINDOW *win, StateMIPS *state)
         return;
     }
 
-    instr_t i = DecodeInstruction(instr);
+    Instruction i = decode_instr(instr);
 
     const char *mnemonic = get_mnemonic(instr);
 
     switch (i.format)
     {
-    case R_rd_rs_rt:
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, $%s", mnemonic, GetRegName(i.r.rd), GetRegName(i.r.rs), GetRegName(i.r.rt));
+    case R_RD_RS_RT:
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, $%s", mnemonic, get_reg_name(i.r.rd), get_reg_name(i.r.rs), get_reg_name(i.r.rt));
         break;
-    case I_rs_rt_i:
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, 0x%04x", mnemonic, GetRegName(i.i.rs), GetRegName(i.i.rt), i.i.imm);
+    case I_RS_RT_I:
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, 0x%04x", mnemonic, get_reg_name(i.i.rs), get_reg_name(i.i.rt), i.i.imm);
         break;
-    case I_rt_i_rs:
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, 0x%04x($%s)", mnemonic, GetRegName(i.i.rt), i.i.imm, GetRegName(i.i.rs));
+    case I_RT_I_RS:
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, 0x%04x($%s)", mnemonic, get_reg_name(i.i.rt), i.i.imm, get_reg_name(i.i.rs));
         break;
-    case J_i:
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s 0x%08x", mnemonic, GetRegName(i.j.target));
+    case J_I:
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s 0x%08x", mnemonic, get_reg_name(i.j.target));
         break;
     default:
         mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: Invalid or unrecognized instruction");

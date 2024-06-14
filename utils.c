@@ -63,9 +63,9 @@ long parse_number(const char *arg)
     return number;
 }
 
-r_type DecodeRType(uint32_t instruction)
+RType decode_r_type(uint32_t instruction)
 {
-    r_type r;
+    RType r;
     // Extracts bits 25-21, 20-16, 15-11, 10-6, 5-0
     r.rs = (instruction >> 21) & 0x1f;
     r.rt = (instruction >> 16) & 0x1f;
@@ -75,9 +75,9 @@ r_type DecodeRType(uint32_t instruction)
     return r;
 }
 
-i_type DecodeIType(uint32_t instruction)
+IType decode_i_type(uint32_t instruction)
 {
-    i_type i;
+    IType i;
     // Extracts bits 25-21, 20-16, 15-0
     i.rs = (instruction >> 21) & 0x1f;
     i.rt = (instruction >> 16) & 0x1f;
@@ -85,28 +85,28 @@ i_type DecodeIType(uint32_t instruction)
     return i;
 }
 
-j_type DecodeJType(uint32_t instruction)
+JType decode_j_type(uint32_t instruction)
 {
-    j_type j;
+    JType j;
     // Extracts bits 25-0
     j.target = instruction & 0x3ffffff;
     return j;
 }
 
-instr_t DecodeInstruction(uint32_t instruction)
+Instruction decode_instr(uint32_t instruction)
 {
-    instr_t instr;
+    Instruction instr;
 
     instr.opcode = instruction >> 26;
 
     switch (instr.opcode)
     {
     case 0x00: // R-type
-        instr.r = DecodeRType(instruction);
+        instr.r = decode_r_type(instruction);
         switch (instr.r.funct)
         {
         case 0x20: // add
-            instr.format = R_rd_rs_rt;
+            instr.format = R_RD_RS_RT;
             break;
         default:
             break;
@@ -114,20 +114,20 @@ instr_t DecodeInstruction(uint32_t instruction)
         break;
 
     case 0x02: // jump
-        instr.j = DecodeJType(instruction);
-        instr.format = J_i;
+        instr.j = decode_j_type(instruction);
+        instr.format = J_I;
         break;
     case 0x0C: // beq
-        instr.i = DecodeIType(instruction);
-        instr.format = I_rs_rt_i;
+        instr.i = decode_i_type(instruction);
+        instr.format = I_RS_RT_I;
         break;
     case 0x23: // lw
-        instr.i = DecodeIType(instruction);
-        instr.format = I_rt_i_rs;
+        instr.i = decode_i_type(instruction);
+        instr.format = I_RT_I_RS;
         break;
     case 0x2B:
-        instr.i = DecodeIType(instruction);
-        instr.format = I_rt_i_rs;
+        instr.i = decode_i_type(instruction);
+        instr.format = I_RT_I_RS;
         break;
     default:
         break;
@@ -136,7 +136,7 @@ instr_t DecodeInstruction(uint32_t instruction)
     return instr;
 }
 
-const char *GetRegName(uint8_t reg)
+const char *get_reg_name(uint8_t reg)
 {
     switch (reg)
     {

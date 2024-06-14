@@ -10,19 +10,19 @@ int main()
     start_color();
     init_pair(1, COLOR_YELLOW, COLOR_BLACK);
 
-    StateMIPS *state = InitMIPS(0x0);
+    StateMIPS *state = init_mips(0x0);
 
     WINDOW *win = create_win(50, 160, 0, 0);
 
     int op = 0;
     int ret = 0;
-    
+
     print_help(win);
     do
     {
         if (op == 1)
         {
-            ret = EmulateMIPSp(state);
+            ret = emulate_mips(state);
         }
 
         print_pc(win, state);
@@ -34,7 +34,7 @@ int main()
         op = handle_input(win, state);
     } while (op != -1);
 
-    FreeMIPS(state);
+    free_mips(state);
 
     endwin(); /* End curses mode		  */
     return 0;

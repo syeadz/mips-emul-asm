@@ -3,9 +3,9 @@
 
 void print_state();
 void print_full();
-void sr(reg_t reg, uint32_t val);
+void sr(Register reg, uint32_t val);
 void sm(uint32_t index, uint32_t val);
-void pr(reg_t reg);
+void pr(Register reg);
 void pm(uint32_t index);
 
 // pointer to MIPS State
@@ -41,7 +41,7 @@ MU_TEST(test_decode_r_type)
     // rs = 10, rt = 8, rd = 9, shamt = 0, funct = 0x20
     // 01010 01000 01001 00000 100000
     uint32_t instruction = 0x01484820;
-    r_type r = DecodeRType(instruction);
+    RType r = decode_r_type(instruction);
 
     // check if flags are correct afterwards
     mu_assert(r.rs == 10, "RS was not set correctly");
@@ -56,7 +56,7 @@ MU_TEST(test_decode_i_type)
     // rs = 10, rt = 8, imm = 0x1234
     // 01010 01000 0001001000110100
     uint32_t instruction = 0x01481034;
-    i_type i = DecodeIType(instruction);
+    IType i = decode_i_type(instruction);
 
     // check if flags are correct afterwards
     mu_assert(i.rs == 10, "RS was not set correctly");
@@ -69,7 +69,7 @@ MU_TEST(test_decode_j_type)
     // target = 0x2345678
     // 00010010001101010101100101111000
     uint32_t instruction = 0xA345678;
-    j_type j = DecodeJType(instruction);
+    JType j = decode_j_type(instruction);
 
     // check if flags are correct afterwards
     mu_assert(j.target == 0x2345678, "Target was not set correctly");
@@ -93,12 +93,12 @@ MU_TEST(test_0x00_0x20_add)
     uint32_t instruction = 0x14b4820;
     sm(0, instruction);
 
-    sr(t2, 0x1234);
-    sr(t3, 0x5678);
+    sr(T2, 0x1234);
+    sr(T3, 0x5678);
 
-    EmulateMIPSp(pState);
+    emulate_mips(pState);
 
-    mu_assert(pState->regs[t1] == 0x1234 + 0x5678, "Add did not work correctly");
+    mu_assert(pState->regs[T1] == 0x1234 + 0x5678, "Add did not work correctly");
 }
 
 // J $addr
@@ -109,7 +109,7 @@ MU_TEST(test_0x02_j)
     uint32_t instruction = 0x800000A;
     sm(0, instruction);
 
-    EmulateMIPSp(pState);
+    emulate_mips(pState);
 
     mu_assert(pState->pc == 0x0A, "J did not work correctly");
 }
@@ -122,10 +122,10 @@ MU_TEST(test_0x0c_beq)
     uint32_t instruction = 0x312a0010;
     sm(0, instruction);
 
-    sr(t1, 0x1234);
-    sr(t2, 0x1234);
+    sr(T1, 0x1234);
+    sr(T2, 0x1234);
 
-    EmulateMIPSp(pState);
+    emulate_mips(pState);
 
     mu_assert(pState->pc == 17, "Beq did not work correctly");
 }
@@ -138,12 +138,12 @@ MU_TEST(test_0x23_lw)
     uint32_t instruction = 0x8d49000c;
     sm(0, instruction);
 
-    sr(t2, 0x10);
+    sr(T2, 0x10);
     sm(0x10 + 12, 0x9ABC);
 
-    EmulateMIPSp(pState);
+    emulate_mips(pState);
 
-    mu_assert(pState->regs[t1] == 0x9ABC, "Lw did not work correctly");
+    mu_assert(pState->regs[T1] == 0x9ABC, "Lw did not work correctly");
 }
 
 // SW $t1, offset($t2)
@@ -154,14 +154,13 @@ MU_TEST(test_0x2b_sw)
     uint32_t instruction = 0xad49000c;
     sm(0, instruction);
 
-    sr(t1, 0x9ABC);
-    sr(t2, 0x01);
+    sr(T1, 0x9ABC);
+    sr(T2, 0x01);
 
-    EmulateMIPSp(pState);
+    emulate_mips(pState);
 
     mu_assert(pState->mem[0x01 + 12] == 0x9ABC, "Sw did not work correctly");
 }
-
 
 MU_TEST_SUITE(opcode_tests)
 {
@@ -200,7 +199,7 @@ void print_full()
 /// @brief Sets the value of a register
 /// @param reg the register to be changed
 /// @param val the value to be set
-void sr(reg_t reg, uint32_t val)
+void sr(Register reg, uint32_t val)
 {
     pState->regs[reg] = val;
 }
@@ -215,7 +214,7 @@ void sm(uint32_t index, uint32_t val)
 
 /// @brief Prints the value of a register
 /// @param reg the register to be printed
-void pr(reg_t reg)
+void pr(Register reg)
 {
     printf("Register %d : %d (%x)\n", reg, pState->regs[reg], pState->regs[reg]);
 }
