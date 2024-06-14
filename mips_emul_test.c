@@ -41,7 +41,7 @@ MU_TEST(test_decode_r_type)
     // rs = 10, rt = 8, rd = 9, shamt = 0, funct = 0x20
     // 01010 01000 01001 00000 100000
     uint32_t instruction = 0x01484820;
-    RType r = decode_r_type(instruction);
+    RArgs r = decode_r_type(instruction);
 
     // check if flags are correct afterwards
     mu_assert(r.rs == 10, "RS was not set correctly");
@@ -56,7 +56,7 @@ MU_TEST(test_decode_i_type)
     // rs = 10, rt = 8, imm = 0x1234
     // 01010 01000 0001001000110100
     uint32_t instruction = 0x01481034;
-    IType i = decode_i_type(instruction);
+    IArgs i = decode_i_type(instruction);
 
     // check if flags are correct afterwards
     mu_assert(i.rs == 10, "RS was not set correctly");
@@ -69,7 +69,7 @@ MU_TEST(test_decode_j_type)
     // target = 0x2345678
     // 00010010001101010101100101111000
     uint32_t instruction = 0xA345678;
-    JType j = decode_j_type(instruction);
+    JArgs j = decode_j_type(instruction);
 
     // check if flags are correct afterwards
     mu_assert(j.target == 0x2345678, "Target was not set correctly");

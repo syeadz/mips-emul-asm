@@ -28,28 +28,28 @@ typedef enum ITemplate
 } ITemplate;
 
 /// @brief Struct to hold r-type instruction
-typedef struct RType
+typedef struct RArgs
 {
     uint8_t rs;
     uint8_t rt;
     uint8_t rd;
     uint8_t shamt;
     uint8_t funct;
-} RType;
+} RArgs;
 
 /// @brief Struct to hold i-type instruction
-typedef struct IType
+typedef struct IArgs
 {
     uint8_t rs;
     uint8_t rt;
     uint16_t imm;
-} IType;
+} IArgs;
 
 /// @brief Struct to hold j-type instruction
-typedef struct JType
+typedef struct JArgs
 {
     uint32_t target;
-} JType;
+} JArgs;
 
 /// @brief Struct to hold instruction
 typedef struct Instruction
@@ -59,9 +59,9 @@ typedef struct Instruction
     ITemplate format;
     union
     {
-        RType r;
-        IType i;
-        JType j;
+        RArgs r;
+        IArgs i;
+        JArgs j;
     };
 } Instruction;
 
@@ -83,17 +83,17 @@ long parse_number(const char *arg);
 /// @brief Decode an R-type instruction
 /// @param instruction
 /// @return RType
-RType decode_r_type(uint32_t instruction);
+RArgs decode_r_type(uint32_t instruction);
 
 /// @brief Decode an I-type instruction
 /// @param instruction
 /// @return IType
-IType decode_i_type(uint32_t instruction);
+IArgs decode_i_type(uint32_t instruction);
 
 /// @brief Decode a J-type instruction
 /// @param instruction
 /// @return JType
-JType decode_j_type(uint32_t instruction);
+JArgs decode_j_type(uint32_t instruction);
 
 /// @brief Get the name of a register.
 /// @param reg

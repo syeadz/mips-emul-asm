@@ -9,9 +9,9 @@ int emulate_mips(StateMIPS *state)
     uint32_t instr = state->mem[state->pc / 4];
     uint8_t opcode = (instr >> 26) & 0x3F;
 
-    RType r = decode_r_type(instr);
-    JType j = decode_j_type(instr);
-    IType i = decode_i_type(instr);
+    RArgs r = decode_r_type(instr);
+    JArgs j = decode_j_type(instr);
+    IArgs i = decode_i_type(instr);
 
     // Increment by 4 bytes (32 bits) to point to next instruction
     state->pc += 4;

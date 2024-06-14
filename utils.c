@@ -63,9 +63,9 @@ long parse_number(const char *arg)
     return number;
 }
 
-RType decode_r_type(uint32_t instruction)
+RArgs decode_r_type(uint32_t instruction)
 {
-    RType r;
+    RArgs r;
     // Extracts bits 25-21, 20-16, 15-11, 10-6, 5-0
     r.rs = (instruction >> 21) & 0x1f;
     r.rt = (instruction >> 16) & 0x1f;
@@ -75,9 +75,9 @@ RType decode_r_type(uint32_t instruction)
     return r;
 }
 
-IType decode_i_type(uint32_t instruction)
+IArgs decode_i_type(uint32_t instruction)
 {
-    IType i;
+    IArgs i;
     // Extracts bits 25-21, 20-16, 15-0
     i.rs = (instruction >> 21) & 0x1f;
     i.rt = (instruction >> 16) & 0x1f;
@@ -85,9 +85,9 @@ IType decode_i_type(uint32_t instruction)
     return i;
 }
 
-JType decode_j_type(uint32_t instruction)
+JArgs decode_j_type(uint32_t instruction)
 {
-    JType j;
+    JArgs j;
     // Extracts bits 25-0
     j.target = instruction & 0x3ffffff;
     return j;
