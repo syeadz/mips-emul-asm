@@ -6,7 +6,7 @@ int EmulateMIPSp(StateMIPS *state)
     // int cycles = 1;
 
     // Get instruction from memory, divide by 4 to get index from address
-    uint32_t instr = state->mem[(state->pc) / 4];
+    uint32_t instr = state->mem[state->pc / 4];
     uint8_t opcode = (instr >> 26) & 0x3F;
 
     r_type r = DecodeRType(instr);
@@ -35,11 +35,11 @@ int EmulateMIPSp(StateMIPS *state)
         break;
 
     case 0x23: // lw
-        state->regs[i.rt] = state->mem[(state->regs[i.rs] + i.imm)/4];
+        state->regs[i.rt] = state->mem[(state->regs[i.rs] + i.imm) / 4];
         break;
 
     case 0x2b: // sw
-        state->mem[(state->regs[i.rs] + i.imm)/4] = state->regs[i.rt];
+        state->mem[(state->regs[i.rs] + i.imm) / 4] = state->regs[i.rt];
         break;
     }
 
@@ -75,7 +75,7 @@ int ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
     // Convert endianness and copy to memory
     for (long unsigned i = 0; i < fsize / sizeof(uint32_t); i++)
     {
-        state->mem[offset/4 + i] = __builtin_bswap32(buffer[i]);
+        state->mem[offset / 4 + i] = __builtin_bswap32(buffer[i]);
     }
 
     // Free the buffer
