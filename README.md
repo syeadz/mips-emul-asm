@@ -54,6 +54,7 @@ Usage: `./num_to_insr <instruction type, (r or i or j)> <number>`
 
 * [MIPS Reference Data](https://courses.cs.washington.edu/courses/cse378/09au/MIPS_Green_Sheet.pdf)
 * [MIPS Reference Sheet](https://uweb.engr.arizona.edu/~ece369/Resources/spim/MIPSReference.pdf)
+* [MIPS Partial Instruction Set](https://ecs-network.serv.pacific.edu/ecpe-170/tutorials/mips-instruction-set)
 * [Writing an Assembler](https://student.cs.uwaterloo.ca/~cs241/slides/sylvie/Sylvie-L5.pdf)
 
 ## Acknowledgements
