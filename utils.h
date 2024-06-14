@@ -106,3 +106,8 @@ const char *get_reg_name(uint8_t reg);
 /// @param opcode 
 /// @return 
 ITemplate get_template_from_opcode(uint8_t opcode);
+
+/// @brief Get the opcode from a mnemonic.
+/// @param mnemonic 
+/// @return 
+uint8_t get_opcode_from_mnemonic(const char *mnemonic);

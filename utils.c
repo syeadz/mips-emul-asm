@@ -152,6 +152,34 @@ Instruction decode_instr(uint32_t instruction)
     return instr;
 }
 
+uint8_t get_opcode_from_mnemonic(const char *mnemonic)
+{
+    if (strcmp(mnemonic, "add") == 0)
+    {
+        return 0x00;
+    }
+    else if (strcmp(mnemonic, "j") == 0)
+    {
+        return 0x02;
+    }
+    else if (strcmp(mnemonic, "beq") == 0)
+    {
+        return 0x0C;
+    }
+    else if (strcmp(mnemonic, "lw") == 0)
+    {
+        return 0x23;
+    }
+    else if (strcmp(mnemonic, "sw") == 0)
+    {
+        return 0x2B;
+    }
+    else
+    {
+        return 0xFF;
+    }
+}
+
 const char *get_reg_name(uint8_t reg)
 {
     switch (reg)
