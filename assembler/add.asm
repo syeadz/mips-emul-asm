@@ -1,6 +1,6 @@
-lw $t1, 12($zero)
-lw $t2, 13($zero)
+lw $t1, 48($zero)
+lw $t2, 52($zero)
 add $t0, $t1, $t2
-sw $t0, 14($zero)
-lw $t3, 14($zero)
-beq $t0, $t3, 15
+sw $t0, 56($zero)
+lw $t3, 56($zero)
+beq $t0, $t3, 60
