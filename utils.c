@@ -11,8 +11,9 @@ const char *get_mnemonic_from_instr(const uint32_t instr)
         if (funct == 0x20)
         {
             return "add";
+        } else {
+            return "unknown";
         }
-        break;
     case 0x02:
         return "j";
     case 0x0C:

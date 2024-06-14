@@ -181,6 +181,43 @@ int handle_input(WINDOW *win, StateMIPS *state)
     return 0;
 }
 
+void print_instr_at(WINDOW *win, uint32_t instr, int y, int x) {
+    wmove(win, y, x);
+    wclrtoeol(win);
+
+    if (instr == 0) {
+        return;
+    }
+
+    uint8_t opcode = instr >> 26;
+
+    const char *mnemonic = get_mnemonic_from_instr(instr);
+
+    if (strcmp(mnemonic, "unknown") == 0) {
+        return;
+    }
+
+    Instruction i = decode_instr(instr);
+
+    switch (i.format)
+    {
+    case R_RD_RS_RT:
+        mvwprintw(win, y, x, "%s $%s, $%s, $%s", mnemonic, get_reg_name(i.r.rd), get_reg_name(i.r.rs), get_reg_name(i.r.rt));
+        break;
+    case I_RS_RT_I:
+        mvwprintw(win, y, x, "%s $%s, $%s, 0x%04x", mnemonic, get_reg_name(i.i.rs), get_reg_name(i.i.rt), i.i.imm);
+        break;
+    case I_RT_I_RS:
+        mvwprintw(win, y, x, "%s $%s, 0x%04x($%s)", mnemonic, get_reg_name(i.i.rt), i.i.imm, get_reg_name(i.i.rs));
+        break;
+    case J_I:
+        mvwprintw(win, y, x, "%s 0x%08x", mnemonic, get_reg_name(i.j.target));
+        break;
+    default:
+        break;
+    }
+}
+
 void print_registers(WINDOW *win, StateMIPS *state)
 {
     mvwprintw(win, REG_ROW_LOC, REG_COL_LOC, "Registers:");
@@ -206,56 +243,61 @@ void print_memory(WINDOW *win, StateMIPS *state)
 
     for (int i = 0; i < MEM_VIEW_SIZE; i++)
     {
+        uint32_t current_address = memory_address + i * 4;
+        uint32_t instr = state->mem[current_address / 4];
+
         // Highlight the current instruction
         if (memory_address + i * 4 == state->pc)
         {
             wattron(win, COLOR_PAIR(1));
-            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", memory_address + i * 4, state->mem[memory_address / 4 + i]);
+            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", current_address, instr);
+            print_instr_at(win, instr, i + MEM_ROW_LOC + 1, MEM_COL_LOC + 32);
             wattroff(win, COLOR_PAIR(1));
         }
         else
         {
-            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", memory_address + i * 4, state->mem[memory_address / 4 + i]);
+            mvwprintw(win, i + MEM_ROW_LOC + 1, MEM_COL_LOC, "0x%08x:\t 0x%08x", current_address, instr);
+            print_instr_at(win, instr, i + MEM_ROW_LOC + 1, MEM_COL_LOC + 32);
         }
     }
 }
 
-void print_current_instr(WINDOW *win, StateMIPS *state)
-{
-    uint32_t instr = state->mem[state->pc / 4];
+// void print_current_instr(WINDOW *win, StateMIPS *state)
+// {
+//     uint32_t instr = state->mem[state->pc / 4];
 
-    wmove(win, 1, MEM_COL_LOC);
-    wclrtoeol(win);
+//     wmove(win, 1, MEM_COL_LOC);
+//     wclrtoeol(win);
 
-    if (instr == 0)
-    {
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: not an instruction");
-        return;
-    }
+//     if (instr == 0)
+//     {
+//         mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: not an instruction");
+//         return;
+//     }
 
-    Instruction i = decode_instr(instr);
+//     Instruction i = decode_instr(instr);
 
-    const char *mnemonic = get_mnemonic_from_instr(instr);
+//     const char *mnemonic = get_mnemonic_from_instr(instr);
 
-    switch (i.format)
-    {
-    case R_RD_RS_RT:
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, $%s", mnemonic, get_reg_name(i.r.rd), get_reg_name(i.r.rs), get_reg_name(i.r.rt));
-        break;
-    case I_RS_RT_I:
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, 0x%04x", mnemonic, get_reg_name(i.i.rs), get_reg_name(i.i.rt), i.i.imm);
-        break;
-    case I_RT_I_RS:
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, 0x%04x($%s)", mnemonic, get_reg_name(i.i.rt), i.i.imm, get_reg_name(i.i.rs));
-        break;
-    case J_I:
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s 0x%08x", mnemonic, get_reg_name(i.j.target));
-        break;
-    default:
-        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: Invalid or unrecognized instruction");
-        break;
-    }
-}
+//     switch (i.format)
+//     {
+//     case R_RD_RS_RT:
+//         mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, $%s", mnemonic, get_reg_name(i.r.rd), get_reg_name(i.r.rs), get_reg_name(i.r.rt));
+//         break;
+//     case I_RS_RT_I:
+//         mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, $%s, 0x%04x", mnemonic, get_reg_name(i.i.rs), get_reg_name(i.i.rt), i.i.imm);
+//         break;
+//     case I_RT_I_RS:
+//         mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s $%s, 0x%04x($%s)", mnemonic, get_reg_name(i.i.rt), i.i.imm, get_reg_name(i.i.rs));
+//         break;
+//     case J_I:
+//         mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s 0x%08x", mnemonic, get_reg_name(i.j.target));
+//         break;
+//     default:
+//         mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: Invalid or unrecognized instruction");
+//         break;
+//     }
+// }
 
 void print_pc(WINDOW *win, StateMIPS *state)
 {
