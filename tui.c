@@ -222,7 +222,7 @@ void print_memory(WINDOW *win, StateMIPS *state)
 
 void print_current_instr(WINDOW *win, StateMIPS *state)
 {
-    uint32_t instr = state->mem[state->pc];
+    uint32_t instr = state->mem[state->pc / 4];
 
     wmove(win, 1, MEM_COL_LOC);
     wclrtoeol(win);
@@ -252,7 +252,7 @@ void print_current_instr(WINDOW *win, StateMIPS *state)
         mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: %s 0x%08x", mnemonic, GetRegName(i.j.target));
         break;
     default:
-        mvwprintw(win, 1, MEM_COL_LOC, "Invalid or unrecognized instruction");
+        mvwprintw(win, 1, MEM_COL_LOC, "Current instruction: Invalid or unrecognized instruction");
         break;
     }
 }
