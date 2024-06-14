@@ -63,25 +63,6 @@ long parse_number(const char *arg)
     return number;
 }
 
-// // Function to print bits from a number within a specified range [start, end]
-// void printBitsSection(unsigned int num, int start, int end)
-// {
-//     // Check if the start and end positions are valid
-//     if (start > end || start < 0 || end >= (sizeof(unsigned int) * 8))
-//     {
-//         printf("Invalid range.\n");
-//         return;
-//     }
-
-//     // Iterate over the specified bit range and print each bit
-//     for (int i = end; i >= start; i--)
-//     {
-//         unsigned int mask = 1 << i;
-//         unsigned int bit = (num & mask) >> i;
-//         printf("%u", bit);
-//     }
-// }
-
 r_type DecodeRType(uint32_t instruction)
 {
     r_type r;
