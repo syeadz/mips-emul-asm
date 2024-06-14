@@ -24,7 +24,9 @@ typedef enum ITemplate
     I_RS_RT_I,     // beq rs, rt, i
 
     J_LABEL, // j label
-    J_I      // j i
+    J_I,      // j i
+
+    UNKNOWN
 } ITemplate;
 
 /// @brief Struct to hold r-type instruction
@@ -73,7 +75,7 @@ Instruction decode_instr(uint32_t instruction);
 /// @brief Returns mnemonic for an instruction.
 /// @param opcode
 /// @return
-const char *get_mnemonic(uint32_t instruction);
+const char *get_mnemonic_from_instr(uint32_t instruction);
 
 /// @brief Parses a number from a string.
 /// @param arg
@@ -99,3 +101,8 @@ JArgs decode_j_type(uint32_t instruction);
 /// @param reg
 /// @return
 const char *get_reg_name(uint8_t reg);
+
+/// @brief Get the the template of an instruction from the opcode.
+/// @param opcode 
+/// @return 
+ITemplate get_template_from_opcode(uint8_t opcode);

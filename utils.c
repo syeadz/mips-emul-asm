@@ -1,6 +1,6 @@
 #include "utils.h"
 
-const char *get_mnemonic(const uint32_t instr)
+const char *get_mnemonic_from_instr(const uint32_t instr)
 {
     uint8_t opcode = (instr >> 26) & 0x3F;
     const uint8_t funct = instr & 0x3F;
@@ -93,41 +93,57 @@ JArgs decode_j_type(uint32_t instruction)
     return j;
 }
 
+ITemplate get_template_from_opcode(uint8_t opcode)
+{
+    switch (opcode)
+    {
+    // R-type
+    case 0x00: // add
+        return R_RD_RS_RT;
+
+
+    // I-type
+     // I_RS_RT_I
+    case 0x0C: // beq
+        return I_RS_RT_I;
+
+    // I_RT_I_RS
+    case 0x23: // lw
+    case 0x2B: // sw
+        return I_RT_I_RS;
+
+
+    // J-type
+    // J_I
+    case 0x02: // j
+        return J_I;
+    default:
+        return UNKNOWN;
+    }
+}
+
 Instruction decode_instr(uint32_t instruction)
 {
     Instruction instr;
 
-    instr.opcode = instruction >> 26;
+    uint8_t opcode = instruction >> 26;
+    ITemplate template = get_template_from_opcode(opcode);
 
-    switch (instr.opcode)
+    instr.instr = instruction;
+    instr.opcode = opcode;
+    instr.format = template;
+
+    switch (template)
     {
-    case 0x00: // R-type
+    case R_RD_RS_RT:
         instr.r = decode_r_type(instruction);
-        switch (instr.r.funct)
-        {
-        case 0x20: // add
-            instr.format = R_RD_RS_RT;
-            break;
-        default:
-            break;
-        }
         break;
-
-    case 0x02: // jump
+    case I_RS_RT_I:
+    case I_RT_I_RS:
+        instr.i = decode_i_type(instruction);
+        break;
+    case J_I:
         instr.j = decode_j_type(instruction);
-        instr.format = J_I;
-        break;
-    case 0x0C: // beq
-        instr.i = decode_i_type(instruction);
-        instr.format = I_RS_RT_I;
-        break;
-    case 0x23: // lw
-        instr.i = decode_i_type(instruction);
-        instr.format = I_RT_I_RS;
-        break;
-    case 0x2B:
-        instr.i = decode_i_type(instruction);
-        instr.format = I_RT_I_RS;
         break;
     default:
         break;

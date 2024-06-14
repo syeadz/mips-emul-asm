@@ -235,7 +235,7 @@ void print_current_instr(WINDOW *win, StateMIPS *state)
 
     Instruction i = decode_instr(instr);
 
-    const char *mnemonic = get_mnemonic(instr);
+    const char *mnemonic = get_mnemonic_from_instr(instr);
 
     switch (i.format)
     {
