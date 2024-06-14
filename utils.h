@@ -6,13 +6,26 @@
 #include <stdlib.h>
 
 /// @brief Enum to hold the type and template of the instruction.
-typedef enum instr_template
+// See: https://uweb.engr.arizona.edu/~ece369/Resources/spim/MIPSReference.pdf
+typedef enum i_template
 {
-    R_rd_rs_rt, // add rd, rs, rt
-    I_rt_i_rs,  // lw rt, i(rs)
-    I_rs_rt_i,  // beq rs, rt, i
-    J_i         // j i
-} instr_template;
+    R_rd_rs_rt,    // add rd, rs, rt
+    R_rs_rt,       // div rs, rt
+    R_rd_rt_shamt, // sll rd, rt, shamt   -- shift left logical
+    R_rd_rt_rs,    // sllv rd, rt, rs     -- shift left logical variable
+    R_rs,          // jr rs
+    R_rd,          // mfhi rd
+
+    I_rt_rs_i,     // addi rt, rs, i
+    I_rt_imm32,    // lhi rt, imm32
+    I_rs_rt_label, // bne rs, rt, label
+    I_rs_label,    // bgtz rs, label
+    I_rt_i_rs,     // lw rt, i(rs)
+    I_rs_rt_i,     // beq rs, rt, i
+
+    J_label, // j label
+    J_i      // j i
+} i_template;
 
 /// @brief Struct to hold r-type instruction
 typedef struct r_type
@@ -43,7 +56,7 @@ typedef struct instr_t
 {
     uint32_t instr;
     uint8_t opcode;
-    instr_template format;
+    i_template format;
     union
     {
         r_type r;
@@ -85,4 +98,4 @@ j_type DecodeJType(uint32_t instruction);
 /// @brief Get the name of a register.
 /// @param reg
 /// @return
-const char* GetRegName(uint8_t reg);
+const char *GetRegName(uint8_t reg);
