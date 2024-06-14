@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "utils.h"
+
 // Useful bitwise macros
 
 #define BIT_MASK(bit_pos) (1 << (bit))
@@ -14,44 +16,47 @@
 // Test if a bit is set
 #define TEST_BIT(variable, bit_pos) (((variable) & BIT_MASK(bit_pos)) ? 1 : 0)
 
-// MIPS registers, use as index into the regs array in StateMIPS
-typedef enum registers
-{
-    zero,
-    at,
-    v0,
-    v1,
-    a0,
-    a1,
-    a2,
-    a3,
-    t0,
-    t1,
-    t2,
-    t3,
-    t4,
-    t5,
-    t6,
-    t7,
-    s0,
-    s1,
-    s2,
-    s3,
-    s4,
-    s5,
-    s6,
-    s7,
-    t8,
-    t9,
-    k0,
-    k1,
-    gp,
-    sp,
-    fp,
-    ra
-} reg_t;
+// This is the size of the memory in bytes
+#define MEM_SIZE 0x1000
 
-typedef enum exception_codes
+// MIPS registers, use as index into the regs array in StateMIPS
+typedef enum Register
+{
+    ZERO,
+    AT,
+    V0,
+    V1,
+    A0,
+    A1,
+    A2,
+    A3,
+    T0,
+    T1,
+    T2,
+    T3,
+    T4,
+    T5,
+    T6,
+    T7,
+    S0,
+    S1,
+    S2,
+    S3,
+    S4,
+    S5,
+    S6,
+    S7,
+    T8,
+    T9,
+    K0,
+    K1,
+    GP,
+    SP,
+    FP,
+    RA
+} Register;
+
+typedef enum ExceptionCode
 {
     Int = 0,  // interrupt
     AdEL = 4, // address error exception (load or instruction fetch)
@@ -65,7 +70,7 @@ typedef enum exception_codes
     Ov = 12,  // arithmetic overflow
     Tr = 13,  // trap
     FPE = 15  // floating point exception
-} exception_t;
+} ExceptionCode;
 
 /// @brief Struct to hold the state of the MIPS processor
 typedef struct StateMIPS
@@ -73,52 +78,12 @@ typedef struct StateMIPS
     // MIPS registers
     uint32_t regs[32];
 
-    // program counter
-    // NOTE: This is the index in the memory array, not the address in memory
+    // program counter, holds the address (not index) of the current instruction
     uint32_t pc;
 
     // pointer to program in memory
     uint32_t *mem;
 } StateMIPS;
-
-/// @brief Struct to hold r-type instruction
-typedef struct r_type
-{
-    uint8_t rs;
-    uint8_t rt;
-    uint8_t rd;
-    uint8_t shamt;
-    uint8_t funct;
-} r_type;
-
-/// @brief Struct to hold i-type instruction
-typedef struct i_type
-{
-    uint8_t rs;
-    uint8_t rt;
-    uint16_t imm;
-} i_type;
-
-/// @brief Struct to hold j-type instruction
-typedef struct j_type
-{
-    uint32_t target;
-} j_type;
-
-/// @brief Decode an R-type instruction
-/// @param instruction
-/// @return r_type
-r_type DecodeRType(uint32_t instruction);
-
-/// @brief Decode an I-type instruction
-/// @param instruction
-/// @return i_type
-i_type DecodeIType(uint32_t instruction);
-
-/// @brief Decode a J-type instruction
-/// @param instruction
-/// @return j_type
-j_type DecodeJType(uint32_t instruction);
 
 /// @brief Read a file into memory at a specific offset
 /// NOTE: This function assumes the file is a binary file
@@ -127,19 +92,19 @@ j_type DecodeJType(uint32_t instruction);
 /// @param state
 /// @param filename
 /// @param offset
-void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset);
+/// @return returns 0 on success, 1 on failure
+int read_file_into_mem_at(StateMIPS *state, char *filename, uint32_t offset);
 
 /// @brief Initialize the MIPS processor
-/// @param mem_size
 /// @param pc_start
 /// @return StateMIPS*
-StateMIPS *InitMIPS(uint32_t mem_size, uint32_t pc_start);
+StateMIPS *init_mips(uint32_t pc_start);
 
 /// @brief Free the MIPS processor
 /// @param state
-void FreeMIPS(StateMIPS *state);
+void free_mips(StateMIPS *state);
 
 /// @brief Emulate the MIPS processor
 /// @param state
 /// @return
-int EmulateMIPSp(StateMIPS *state);
+int emulate_mips(StateMIPS *state);

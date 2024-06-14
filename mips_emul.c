@@ -1,17 +1,20 @@
 #include "mips_emul.h"
 
-int EmulateMIPSp(StateMIPS *state)
+int emulate_mips(StateMIPS *state)
 {
+    // If keeping track of cycles
     // int cycles = 1;
-    uint32_t instr = state->mem[state->pc];
+
+    // Get instruction from memory, divide by 4 to get index from address
+    uint32_t instr = state->mem[state->pc / 4];
     uint8_t opcode = (instr >> 26) & 0x3F;
 
-    r_type r = DecodeRType(instr);
-    j_type j = DecodeJType(instr);
-    i_type i = DecodeIType(instr);
+    RArgs r = decode_r_type(instr);
+    JArgs j = decode_j_type(instr);
+    IArgs i = decode_i_type(instr);
 
-    // TODO: consider using address for PC instead of index
-    state->pc += 1;
+    // Increment by 4 bytes (32 bits) to point to next instruction
+    state->pc += 4;
 
     switch (opcode)
     {
@@ -32,53 +35,24 @@ int EmulateMIPSp(StateMIPS *state)
         break;
 
     case 0x23: // lw
-        state->regs[i.rt] = state->mem[state->regs[i.rs] + i.imm];
+        state->regs[i.rt] = state->mem[(state->regs[i.rs] + i.imm) / 4];
         break;
 
     case 0x2b: // sw
-        state->mem[state->regs[i.rs] + i.imm] = state->regs[i.rt];
+        state->mem[(state->regs[i.rs] + i.imm) / 4] = state->regs[i.rt];
         break;
     }
 
     return 0;
 }
 
-r_type DecodeRType(uint32_t instruction)
-{
-    r_type r;
-    // Extracts bits 25-21, 20-16, 15-11, 10-6, 5-0
-    r.rs = (instruction >> 21) & 0x1f;
-    r.rt = (instruction >> 16) & 0x1f;
-    r.rd = (instruction >> 11) & 0x1f;
-    r.shamt = (instruction >> 6) & 0x1f;
-    r.funct = instruction & 0x3f;
-    return r;
-}
-
-i_type DecodeIType(uint32_t instruction)
-{
-    i_type i;
-    // Extracts bits 25-21, 20-16, 15-0
-    i.rs = (instruction >> 21) & 0x1f;
-    i.rt = (instruction >> 16) & 0x1f;
-    i.imm = instruction & 0xffff;
-    return i;
-}
-
-j_type DecodeJType(uint32_t instruction)
-{
-    j_type j;
-    // Extracts bits 25-0
-    j.target = instruction & 0x3ffffff;
-    return j;
-}
-void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
+int read_file_into_mem_at(StateMIPS *state, char *filename, uint32_t offset)
 {
     FILE *f = fopen(filename, "rb");
     if (f == NULL)
     {
         printf("error: Couldn't open %s\n", filename);
-        exit(1);
+        return 1;
     }
 
     fseek(f, 0L, SEEK_END);
@@ -89,9 +63,9 @@ void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
     uint32_t *buffer = malloc(fsize);
     if (buffer == NULL)
     {
-        printf("error: Couldn't allocate memory\n");
+        printf("error: Couldn't allocate buffer for %s\n", filename);
         fclose(f);
-        exit(1);
+        return 1;
     }
 
     // Read the file into the buffer
@@ -101,22 +75,23 @@ void ReadFileIntoMemoryAt(StateMIPS *state, char *filename, uint32_t offset)
     // Convert endianness and copy to memory
     for (long unsigned i = 0; i < fsize / sizeof(uint32_t); i++)
     {
-        state->mem[offset + i] = __builtin_bswap32(buffer[i]);
+        state->mem[offset / 4 + i] = __builtin_bswap32(buffer[i]);
     }
 
     // Free the buffer
     free(buffer);
+    return 0;
 }
 
-StateMIPS *InitMIPS(uint32_t mem_size, uint32_t pc_start)
+StateMIPS *init_mips(uint32_t pc_start)
 {
     StateMIPS *state = calloc(1, sizeof(StateMIPS));
-    state->mem = malloc(mem_size); // change to 2^32 for full 4GB address space
+    state->mem = malloc(MEM_SIZE); // change to 2^32 for full 4GB address space
     state->pc = pc_start;
     return state;
 }
 
-void FreeMIPS(StateMIPS *state)
+void free_mips(StateMIPS *state)
 {
     free(state->mem);
     free(state);
