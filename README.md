@@ -16,6 +16,8 @@ To build the emulator, run `make` from root directory. The emulator requires the
 
 To build the assembler, go to the `assembler/` folder and run `make`.
 
+If you get any errors, check if you have the necessary libraries installed. You can install `ncurses` using `sudo apt-get install libncurses5-dev`. Also, make sure you have the `build/` directory created in the root directory. You can also use `make setup` to create the directory.
+
 ### Testing
 
 There are unit tests in place for the emulator. To run them, run `make test`.
@@ -57,7 +59,7 @@ beq $t0, $t3, 60
 We will start by assembling the program:
 
 ```bash
-$ make -C assembler/ # build the assembler
+$ make -C assembler/ # build the assembler, make sure build/ directory is created, otherwise run `make setup`
 $ ./assembler/asm assembler/add.asm add.bin # assemble the program
 ```
 
