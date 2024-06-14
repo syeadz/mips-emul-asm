@@ -3,7 +3,7 @@ CFLAGS = -g -Wall -Wextra
 
 ODIR = ../build
 
-ASSEMBLER_OBJS = $(ODIR)/mips_asm.o $(ODIR)/parser.o $(ODIR)/tokenizer.o $(ODIR)/utility.o
+ASSEMBLER_OBJS = $(ODIR)/mips_asm.o $(ODIR)/parser.o $(ODIR)/tokenizer.o $(ODIR)/utils.o
 
 ASSEMBLER_EXEC = asm
 
@@ -17,6 +17,9 @@ $(ASSEMBLER_EXEC): $(ASSEMBLER_OBJS)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 $(ODIR)/%.o: %.c %.h
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+$(ODIR)/utils.o: ../utils.c ../utils.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 setup:

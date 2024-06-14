@@ -111,3 +111,13 @@ ITemplate get_template_from_opcode(uint8_t opcode);
 /// @param mnemonic 
 /// @return 
 uint8_t get_opcode_from_mnemonic(const char *mnemonic);
+
+/// @brief Gets the register number from the register name.
+/// @param reg 
+/// @return 
+int get_register_number_from_name(const char *reg);
+
+/// @brief Gets the opcode from the mnemonic.
+/// @param mnemonic 
+/// @return 
+uint8_t get_opcode_from_mnemonic(const char *mnemonic);

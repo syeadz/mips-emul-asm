@@ -7,7 +7,7 @@
 
 #include "tokenizer.h"
 #include "parser.h"
-#include "utility.h"
+#include "../utils.h"
 
 /// @brief Reads the contents of a file into a buffer.
 /// @param filename
