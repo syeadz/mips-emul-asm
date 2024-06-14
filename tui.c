@@ -150,6 +150,12 @@ int handle_input(WINDOW *win, StateMIPS *state)
     switch (ch)
     {
     case 'n':
+        if (state->mem[state->pc / 4] == 0)
+        {
+            return 1;
+        }
+        mvwprintw(win, OUTPUT_LINE, 1, "Completed instruction at 0x%08x: ", state->pc);
+        print_instr_at(win, state->mem[state->pc / 4], OUTPUT_LINE, 38);
         return 1;
     case 'j':
         jump_to_instruction(win, state);
@@ -176,16 +182,21 @@ int handle_input(WINDOW *win, StateMIPS *state)
         memory_address -= MEM_VIEW_STEP;
         mvwprintw(win, OUTPUT_LINE, 1, "Moved up, memory address: 0x%08x", memory_address);
         return 0;
+    default:
+        print_help(win);
+        return 0;
     }
 
     return 0;
 }
 
-void print_instr_at(WINDOW *win, uint32_t instr, int y, int x) {
+void print_instr_at(WINDOW *win, uint32_t instr, int y, int x)
+{
     wmove(win, y, x);
     wclrtoeol(win);
 
-    if (instr == 0) {
+    if (instr == 0)
+    {
         return;
     }
 
@@ -193,7 +204,8 @@ void print_instr_at(WINDOW *win, uint32_t instr, int y, int x) {
 
     const char *mnemonic = get_mnemonic_from_instr(instr);
 
-    if (strcmp(mnemonic, "unknown") == 0) {
+    if (strcmp(mnemonic, "unknown") == 0)
+    {
         return;
     }
 

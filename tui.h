@@ -22,7 +22,7 @@
 #define MEM_VIEW_STEP 4
 
 // Output line for messages
-#define OUTPUT_LINE 40
+#define OUTPUT_LINE MEM_ROW_LOC + MEM_VIEW_SIZE + 2
 
 /// @brief Creates a new window based on parameters.
 /// @param height
@@ -55,6 +55,13 @@ void print_current_instr(WINDOW *win, StateMIPS *state);
 /// @brief Displays the help menu.
 /// @param win
 void print_help(WINDOW *win);
+
+/// @brief Prints the instruction at a specific memory location.
+/// @param win
+/// @param instr
+/// @param y
+/// @param x
+void print_instr_at(WINDOW *win, uint32_t instr, int y, int x);
 
 // /// @brief Jumps to a specific instruction.
 // /// @param win
