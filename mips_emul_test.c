@@ -127,7 +127,7 @@ MU_TEST(test_0x0c_beq)
 
     emulate_mips(pState);
 
-    mu_assert(pState->pc == 17, "Beq did not work correctly");
+    mu_assert(pState->pc == 0x10 + 0x4, "Beq did not work correctly");
 }
 
 // LW $t1, offset($t2)
@@ -159,7 +159,7 @@ MU_TEST(test_0x2b_sw)
 
     emulate_mips(pState);
 
-    mu_assert(pState->mem[0x01 + 12] == 0x9ABC, "Sw did not work correctly");
+    mu_assert(pState->mem[(0x01 + 12) / 4] == 0x9ABC, "Sw did not work correctly");
 }
 
 MU_TEST_SUITE(opcode_tests)
@@ -205,11 +205,11 @@ void sr(Register reg, uint32_t val)
 }
 
 /// @brief Sets a value at a memory location
-/// @param index index in memory
+/// @param addr Address in memory
 /// @param val value to be set
-void sm(uint32_t index, uint32_t val)
+void sm(uint32_t addr, uint32_t val)
 {
-    pState->mem[index] = val;
+    pState->mem[addr / 4] = val;
 }
 
 /// @brief Prints the value of a register
@@ -220,8 +220,8 @@ void pr(Register reg)
 }
 
 /// @brief Prints the value at a memory location
-/// @param index index in memory
-void pm(uint32_t index)
+/// @param addr Address in memory
+void pm(uint32_t addr)
 {
-    printf("Memory at %d: %d (%x)\n", index, pState->mem[index], pState->mem[index]);
+    printf("Memory at %d: %d (%x)\n", addr, pState->mem[addr / 4], pState->mem[addr / 4]);
 }
