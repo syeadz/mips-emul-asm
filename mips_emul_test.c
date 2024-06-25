@@ -127,7 +127,7 @@ MU_TEST(test_0x0c_beq)
 
     emulate_mips(pState);
 
-    mu_assert(pState->pc == 0x10 + 0x4, "Beq did not work correctly");
+    mu_assert(pState->pc == 0x10 * 4 + 0x4, "Beq did not work correctly");
 }
 
 // LW $t1, offset($t2)

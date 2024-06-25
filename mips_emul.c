@@ -30,7 +30,7 @@ int emulate_mips(StateMIPS *state)
     case 0x0c: // beq
         if (state->regs[i.rs] == state->regs[i.rt])
         {
-            state->pc += i.imm;
+            state->pc += i.imm * 4; // jump by offset (in words, so multiply by 4 bytes)
         }
         break;
 

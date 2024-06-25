@@ -43,7 +43,7 @@ For the assembler, run `./asm <input file> <output file>` to produce a binary fi
 
 ### Example
 
-We will turn a simple assembly program into machine code using the assembler and then run it in the emulator. The program is a simple one that loads 2 numbers from memory, adds them together, stores the result in memory, and finally branches if 2 registers are equal.
+We will turn a simple assembly program into machine code using the assembler and then run it in the emulator. The program is a simple one that loads 2 numbers from memory, adds them together, stores the result in memory, and finally branches if 2 registers are equal. Note that the branch will move 9 words + 1 instruction ahead if the condition is met.
 
 Contents of `assembler/add.asm`:
 
@@ -53,7 +53,7 @@ lw $t2, 52($zero)
 add $t0, $t1, $t2
 sw $t0, 56($zero)
 lw $t3, 56($zero)
-beq $t0, $t3, 60
+beq $t0, $t3, 9
 ```
 
 We will start by assembling the program:
@@ -93,7 +93,7 @@ $ xxd -g4 -c4 memory.bin
 00000004: 00000002  ....
 ```
 
-Now we can run the emulator using `./main` or `make run`. Remember to have a large enough terminal window. You should be able to see available commands at the bottom on startup. Press `q` if not and resize the terminal and restart the emulator. We can then load the program and memory files. Run the following commands in the emulator:
+Now we can run the emulator using `./main` or `make run`. Remember to have a large enough terminal window. You should be able to see available commands at the bottom on startup. Press `q` if not and resize the terminal and restart the emulator. We can then load the program and memory files. Run the following commands in the emulator (values are in hex):
 
 ```
 l
@@ -105,7 +105,7 @@ memory.bin
 30
 ```
 
-You can then step through the program using `n` and see the results in the memory window. The program should load the numbers 1 and 2, add them together, store the result in memory, and then branch if the 2 registers are equal. It should also display the instructions themselves on the right side of the terminal. Keep track of the register names and memory addresses to see the program in action.
+You can then step through the program using `n` and see the results in the memory window. The program should load the numbers 1 and 2, add them together, store the result in memory, and then branch if the 2 registers are equal. It should also display the instructions themselves on the right side of the terminal. Keep track of the register names and memory addresses to see the program in action. Note that the branch will move 9 words + 1 instruction ahead if the condition is met. This means it will branch to address `0x3c` by the end of the program.
 
 ## Tools
 
