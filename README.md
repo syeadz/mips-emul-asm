@@ -1,5 +1,7 @@
 # MIPS Emulator and Assembler
 
+<img src="screenshots/example.png" width="500">
+
 Very stripped down emulator and assembler for MIPS instruction set. The emulator uses a TUI interface to interact with the user. The assembler is very basic and only supports 5 commands.
 
 Available commands:
@@ -59,8 +61,8 @@ beq $t0, $t3, 9
 We will start by assembling the program:
 
 ```bash
-$ make -C assembler/ # build the assembler, make sure build/ directory is created, otherwise run `make setup`
-$ ./assembler/asm assembler/add.asm add.bin # assemble the program
+make -C assembler/ # build the assembler, make sure build/ directory is created, otherwise run `make setup`
+./assembler/asm assembler/add.asm add.bin # assemble the program
 ```
 
 You can inspect the binary file using `xxd -g4 -c4 add.bin` (you will need to install the `xxd` tool) if you want to see the machine code. You can take one of the lines and run it through the `num_to_instr` tool to see the machine code broken down. You will need to run `make -C tools/` to build the tools first. Example output is below:
