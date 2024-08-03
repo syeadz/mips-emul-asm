@@ -166,7 +166,7 @@ uint8_t get_opcode_from_mnemonic(const char *mnemonic)
     if (strcmp(mnemonic, "sw") == 0)
         return 0x2b;
     
-    return 0xFFFF;
+    return 0xFF;
 }
 
 const char *get_reg_name(uint8_t reg)
