@@ -14,8 +14,8 @@ MU_TEST(test_add_asm)
                  "lw $t2, 52($zero)\n"
                  "# ignore my comment\n"
                  "add $t0, $t1, $t2\n"
-                 "sw $t0, 56($zero)\n"
-                 "lw $t3, 56($zero)\n"
+                 "sw $t0, 0x38($zero)\n"
+                 "lw $t3, 0X38($zero)\n"
                  "#ignore my comment again\n"
                  "beq $t0, $t3, 9\n";
 
@@ -31,8 +31,8 @@ MU_TEST(test_add_asm)
     token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t1", "48", "$zero");
     token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t2", "52", "$zero");
     token_add_instr_rg_rg_rg(correct_tokens, &count, "add", "$t0", "$t1", "$t2");
-    token_add_instr_rg_off_rg(correct_tokens, &count, "sw", "$t0", "56", "$zero");
-    token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t3", "56", "$zero");
+    token_add_instr_rg_off_rg(correct_tokens, &count, "sw", "$t0", "0x38", "$zero");
+    token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t3", "0X38", "$zero");
     token_add_instr_rg_rg_const(correct_tokens, &count, "beq", "$t0", "$t3", "9");
 
     char error_msg[50];
@@ -71,7 +71,7 @@ int main()
 
 TokenType get_const_token_type(char *const_val)
 {
-    if (strlen(const_val) < 2 || const_val[0] != 0)
+    if (strlen(const_val) < 2 || const_val[0] != '0')
     {
         return TOKEN_DEC_CONST;
     }
