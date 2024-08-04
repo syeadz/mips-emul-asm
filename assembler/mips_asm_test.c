@@ -10,12 +10,14 @@ void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *
 
 MU_TEST(test_add_asm)
 {
-    char *code = "lw $t1, 48($zero)"
-                 "lw $t2, 52($zero)"
-                 "add $t0, $t1, $t2"
-                 "sw $t0, 56($zero)"
-                 "lw $t3, 56($zero)"
-                 "beq $t0, $t3, 9";
+    char *code = "lw $t1, 48($zero)\n"
+                 "lw $t2, 52($zero)\n"
+                 "# ignore my comment\n"
+                 "add $t0, $t1, $t2\n"
+                 "sw $t0, 56($zero)\n"
+                 "lw $t3, 56($zero)\n"
+                 "#ignore my comment again\n"
+                 "beq $t0, $t3, 9\n";
 
     Token tokens[MAX_TOKENS];
     int token_count = 0;

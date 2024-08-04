@@ -18,9 +18,14 @@ typedef enum
     COMMA,
     L_PAREN,
     R_PAREN,
+    COMMENT,
     ERROR,
     FINAL
 } State;
+
+// Function prototypes
+const char *state_to_str(State state);
+TokenType state_to_token_type(State state);
 
 // Function to determine the next state
 State next_state(State current, char input)
@@ -31,6 +36,10 @@ State next_state(State current, char input)
 
     // START state is the initial state, where the DFA starts processing the input
     case START:
+        if (input == '#')
+        {
+            return COMMENT;
+        }
         if (isalpha(input))
             return IDENTIFIER;
         if (isdigit(input))
@@ -49,6 +58,11 @@ State next_state(State current, char input)
             return REGISTER_PREFIX;
         if (isspace(input))
             return WHITESPACE;
+        break;
+
+    case COMMENT:
+        if (input != '\n')
+            return COMMENT;
         break;
 
     // WHITESPACE state is used to skip over whitespace characters
@@ -120,9 +134,57 @@ State next_state(State current, char input)
     return ERROR;
 }
 
+void tokenize(const char *input, Token *tokens, int *num_tokens)
+{
+    // We start in the START state with the input pointer at the beginning of the input string
+    State state = START;
+    const char *token_start = input;
+
+    int token_num = 0;
+
+    // While we haven't reached the end of the input string
+    while (*input)
+    {
+        // Determine the next state based on the current state and the current input character
+        State next = next_state(state, *input);
+        // If the next state is WHITESPACE, ERROR or START, we have reached the end of the current token
+        if (next == WHITESPACE || next == ERROR || next == START)
+        {
+            // If the current state is not START, WHITESPACE, COMMENT, or ERROR, we have a valid token
+            if (state != START && state != WHITESPACE && state != COMMENT)
+            {
+                tokens[*num_tokens].type = state_to_token_type(state);
+                tokens[*num_tokens].value = strndup(token_start, input - token_start);
+                (*num_tokens)++;
+                // printf("Token %d: %.*s, Type: %s\n", token_num, (int)(input - token_start), token_start, state_to_str(state));
+                token_num++;
+            }
+            // Update the token start pointer and the state
+            token_start = input + (next == WHITESPACE ? 1 : 0);
+            // We increment the input pointer if the next state is WHITESPACE
+            input += (next == WHITESPACE ? 1 : 0);
+            state = START;
+        }
+        else
+        {
+            state = next;
+            input++;
+        }
+    }
+
+    // Last token
+    if (state != START && state != ERROR && state != WHITESPACE)
+    {
+        tokens[*num_tokens].type = state_to_token_type(state);
+        tokens[*num_tokens].value = strndup(token_start, input - token_start);
+        (*num_tokens)++;
+        // printf("Token %d: %.*s, Type: %s\n", token_num, (int)(input - token_start), token_start, state_to_str(state));
+    }
+}
+
 /// @brief Converts a state to a string for debugging purposes.
-/// @param state 
-/// @return 
+/// @param state
+/// @return
 const char *state_to_str(State state)
 {
     switch (state)
@@ -153,8 +215,8 @@ const char *state_to_str(State state)
 }
 
 /// @brief Converts a state to a token type.
-/// @param state 
-/// @return 
+/// @param state
+/// @return
 TokenType state_to_token_type(State state)
 {
     switch (state)
@@ -181,53 +243,5 @@ TokenType state_to_token_type(State state)
         return TOKEN_ERROR;
     default:
         return TOKEN_UNKNOWN;
-    }
-}
-
-void tokenize(const char *input, Token *tokens, int *num_tokens)
-{
-    // We start in the START state with the input pointer at the beginning of the input string
-    State state = START;
-    const char *token_start = input;
-
-    int token_num = 0;
-
-    // While we haven't reached the end of the input string
-    while (*input)
-    {
-        // Determine the next state based on the current state and the current input character
-        State next = next_state(state, *input);
-        // If the next state is WHITESPACE, ERROR or START, we have reached the end of the current token
-        if (next == WHITESPACE || next == ERROR || next == START)
-        {
-            // If the current state is not START, WHITESPACE or ERROR, we have a valid token
-            if (state != START && state != WHITESPACE)
-            {
-                tokens[*num_tokens].type = state_to_token_type(state);
-                tokens[*num_tokens].value = strndup(token_start, input - token_start);
-                (*num_tokens)++;
-                // printf("Token %d: %.*s, Type: %s\n", token_num, (int)(input - token_start), token_start, state_to_str(state));
-                token_num++;
-            }
-            // Update the token start pointer and the state
-            token_start = input + (next == WHITESPACE ? 1 : 0);
-            // We increment the input pointer if the next state is WHITESPACE
-            input += (next == WHITESPACE ? 1 : 0);
-            state = START;
-        }
-        else
-        {
-            state = next;
-            input++;
-        }
-    }
-
-    // Last token
-    if (state != START && state != ERROR && state != WHITESPACE)
-    {
-        tokens[*num_tokens].type = state_to_token_type(state);
-        tokens[*num_tokens].value = strndup(token_start, input - token_start);
-        (*num_tokens)++;
-        // printf("Token %d: %.*s, Type: %s\n", token_num, (int)(input - token_start), token_start, state_to_str(state));
     }
 }
