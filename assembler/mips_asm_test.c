@@ -2,9 +2,9 @@
 #include "mips_asm.h"
 
 // Function prototypes
-void token_add_instr_rg_decOff_rg(Token tokens[], int *count, char *instr, char *reg1, char *offset, char *reg2);
+void token_add_instr_rg_off_rg(Token tokens[], int *count, char *instr, char *reg1, char *offset, char *reg2);
 void token_add_instr_rg_rg_rg(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *reg3);
-void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *dec_const);
+void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *const_val);
 
 // ********* function tests ********* //
 
@@ -26,11 +26,11 @@ MU_TEST(test_add_asm)
 
     Token correct_tokens[40];
     int count = 0;
-    token_add_instr_rg_decOff_rg(correct_tokens, &count, "lw", "$t1", "48", "$zero");
-    token_add_instr_rg_decOff_rg(correct_tokens, &count, "lw", "$t2", "52", "$zero");
+    token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t1", "48", "$zero");
+    token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t2", "52", "$zero");
     token_add_instr_rg_rg_rg(correct_tokens, &count, "add", "$t0", "$t1", "$t2");
-    token_add_instr_rg_decOff_rg(correct_tokens, &count, "sw", "$t0", "56", "$zero");
-    token_add_instr_rg_decOff_rg(correct_tokens, &count, "lw", "$t3", "56", "$zero");
+    token_add_instr_rg_off_rg(correct_tokens, &count, "sw", "$t0", "56", "$zero");
+    token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t3", "56", "$zero");
     token_add_instr_rg_rg_const(correct_tokens, &count, "beq", "$t0", "$t3", "9");
 
     char error_msg[50];
@@ -67,13 +67,28 @@ int main()
 
 // ********* Helper functions ********* //
 
-/// Adds proper tokens to array for a lw $reg, dec_const($reg) type instruction
-void token_add_instr_rg_decOff_rg(Token tokens[], int *count, char *instr, char *reg1, char *offset, char *reg2)
+TokenType get_const_token_type(char *const_val)
+{
+    if (strlen(const_val) < 2 || const_val[0] != 0)
+    {
+        return TOKEN_DEC_CONST;
+    }
+
+    if (const_val[1] == 'x' || const_val[1] == 'X')
+    {
+        return TOKEN_HEX_CONST;
+    }
+
+    return TOKEN_ERROR;
+}
+
+/// Adds proper tokens to array for a lw $reg, const($reg) type instruction
+void token_add_instr_rg_off_rg(Token tokens[], int *count, char *instr, char *reg1, char *offset, char *reg2)
 {
     tokens[(*count)++] = (Token){.type = TOKEN_IDENTIFIER, .value = instr};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg1};
     tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
-    tokens[(*count)++] = (Token){.type = TOKEN_DEC_CONST, offset};
+    tokens[(*count)++] = (Token){.type = get_const_token_type(offset), offset};
     tokens[(*count)++] = (Token){.type = TOKEN_L_PAREN, "("};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, reg2};
     tokens[(*count)++] = (Token){.type = TOKEN_R_PAREN, ")"};
@@ -91,12 +106,12 @@ void token_add_instr_rg_rg_rg(Token tokens[], int *count, char *instr, char *reg
 }
 
 /// Adds proper tokens to array for an add $reg1, $reg2, dec_const type instruction
-void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *dec_const)
+void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *const_val)
 {
     tokens[(*count)++] = (Token){.type = TOKEN_IDENTIFIER, .value = instr};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg1};
     tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg2};
     tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
-    tokens[(*count)++] = (Token){.type = TOKEN_DEC_CONST, .value = dec_const};
+    tokens[(*count)++] = (Token){.type = get_const_token_type(const_val), .value = const_val};
 }
