@@ -1,6 +1,11 @@
 #include "../minunit.h"
 #include "mips_asm.h"
 
+// Function prototypes
+void token_add_instr_rg_decOff_rg(Token tokens[], int *count, char *instr, char *reg1, char *offset, char *reg2);
+void token_add_instr_rg_rg_rg(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *reg3);
+void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *dec_const);
+
 // ********* function tests ********* //
 
 MU_TEST(test_add_asm)
@@ -19,52 +24,18 @@ MU_TEST(test_add_asm)
 
     mu_assert(token_count == 40, "Token count wrong");
 
-    Token correct_tokens[] = {
-        [0] = {.type = TOKEN_IDENTIFIER, .value = "lw"},
-        [1] = {.type = TOKEN_REGISTER, .value = "$t1"},
-        [2] = {.type = TOKEN_COMMA, .value = ","},
-        [3] = {.type = TOKEN_DEC_CONST, .value = "48"},
-        [4] = {.type = TOKEN_L_PAREN, .value = "("},
-        [5] = {.type = TOKEN_REGISTER, .value = "$zero"},
-        [6] = {.type = TOKEN_R_PAREN, .value = ")"},
-        [7] = {.type = TOKEN_IDENTIFIER, .value = "lw"},
-        [8] = {.type = TOKEN_REGISTER, .value = "$t2"},
-        [9] = {.type = TOKEN_COMMA, .value = ","},
-        [10] = {.type = TOKEN_DEC_CONST, .value = "52"},
-        [11] = {.type = TOKEN_L_PAREN, .value = "("},
-        [12] = {.type = TOKEN_REGISTER, .value = "$zero"},
-        [13] = {.type = TOKEN_R_PAREN, .value = ")"},
-        [14] = {.type = TOKEN_IDENTIFIER, .value = "add"},
-        [15] = {.type = TOKEN_REGISTER, .value = "$t0"},
-        [16] = {.type = TOKEN_COMMA, .value = ","},
-        [17] = {.type = TOKEN_REGISTER, .value = "$t1"},
-        [18] = {.type = TOKEN_COMMA, .value = ","},
-        [19] = {.type = TOKEN_REGISTER, .value = "$t2"},
-        [20] = {.type = TOKEN_IDENTIFIER, .value = "sw"},
-        [21] = {.type = TOKEN_REGISTER, .value = "$t0"},
-        [22] = {.type = TOKEN_COMMA, .value = ","},
-        [23] = {.type = TOKEN_DEC_CONST, .value = "56"},
-        [24] = {.type = TOKEN_L_PAREN, .value = "("},
-        [25] = {.type = TOKEN_REGISTER, .value = "$zero"},
-        [26] = {.type = TOKEN_R_PAREN, .value = ")"},
-        [27] = {.type = TOKEN_IDENTIFIER, .value = "lw"},
-        [28] = {.type = TOKEN_REGISTER, .value = "$t3"},
-        [29] = {.type = TOKEN_COMMA, .value = ","},
-        [30] = {.type = TOKEN_DEC_CONST, .value = "56"},
-        [31] = {.type = TOKEN_L_PAREN, .value = "("},
-        [32] = {.type = TOKEN_REGISTER, .value = "$zero"},
-        [33] = {.type = TOKEN_R_PAREN, .value = ")"},
-        [34] = {.type = TOKEN_IDENTIFIER, .value = "beq"},
-        [35] = {.type = TOKEN_REGISTER, .value = "$t0"},
-        [36] = {.type = TOKEN_COMMA, .value = ","},
-        [37] = {.type = TOKEN_REGISTER, .value = "$t3"},
-        [38] = {.type = TOKEN_COMMA, .value = ","},
-        [39] = {.type = TOKEN_DEC_CONST, .value = "9"},
-    };
+    Token correct_tokens[40];
+    int count = 0;
+    token_add_instr_rg_decOff_rg(correct_tokens, &count, "lw", "$t1", "48", "$zero");
+    token_add_instr_rg_decOff_rg(correct_tokens, &count, "lw", "$t2", "52", "$zero");
+    token_add_instr_rg_rg_rg(correct_tokens, &count, "add", "$t0", "$t1", "$t2");
+    token_add_instr_rg_decOff_rg(correct_tokens, &count, "sw", "$t0", "56", "$zero");
+    token_add_instr_rg_decOff_rg(correct_tokens, &count, "lw", "$t3", "56", "$zero");
+    token_add_instr_rg_rg_const(correct_tokens, &count, "beq", "$t0", "$t3", "9");
 
     char error_msg[50];
 
-    for (size_t i = 0; i < token_count; i++)
+    for (size_t i = 0; i < 40; i++)
     {
         TokenType type = tokens[i].type;
         char *value = tokens[i].value;
@@ -95,3 +66,37 @@ int main()
 }
 
 // ********* Helper functions ********* //
+
+/// Adds proper tokens to array for a lw $reg, dec_const($reg) type instruction
+void token_add_instr_rg_decOff_rg(Token tokens[], int *count, char *instr, char *reg1, char *offset, char *reg2)
+{
+    tokens[(*count)++] = (Token){.type = TOKEN_IDENTIFIER, .value = instr};
+    tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg1};
+    tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
+    tokens[(*count)++] = (Token){.type = TOKEN_DEC_CONST, offset};
+    tokens[(*count)++] = (Token){.type = TOKEN_L_PAREN, "("};
+    tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, reg2};
+    tokens[(*count)++] = (Token){.type = TOKEN_R_PAREN, ")"};
+}
+
+/// Adds proper tokens to array for an add $reg1, $reg2, $reg3 type instruction
+void token_add_instr_rg_rg_rg(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *reg3)
+{
+    tokens[(*count)++] = (Token){.type = TOKEN_IDENTIFIER, .value = instr};
+    tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg1};
+    tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
+    tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg2};
+    tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
+    tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg3};
+}
+
+/// Adds proper tokens to array for an add $reg1, $reg2, dec_const type instruction
+void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *dec_const)
+{
+    tokens[(*count)++] = (Token){.type = TOKEN_IDENTIFIER, .value = instr};
+    tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg1};
+    tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
+    tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg2};
+    tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
+    tokens[(*count)++] = (Token){.type = TOKEN_DEC_CONST, .value = dec_const};
+}
