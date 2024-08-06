@@ -1,5 +1,7 @@
 #include "parser.h"
 
+// R TYPE PARSERS
+
 /// @brief Parses an R-type instruction with the format "op rd, rs, rt" into an AST node
 /// @param tokens
 /// @param index
@@ -68,6 +70,8 @@ void parse_r_type_f_rd_rs_rt(const Token *tokens, int *index, AST *ast)
     // Add node to AST
     ast->nodes[ast->size++] = node;
 }
+
+// I TYPE PARSERS
 
 /// @brief Parses an I-type instruction with the format "op rt, i(rs) into an AST node
 /// @param tokens
@@ -198,6 +202,8 @@ void parse_i_type_rs_rt_label(const Token *tokens, int *index, AST *ast)
     ast->nodes[ast->size++] = node;
 }
 
+// J TYPE PARSERS
+
 /// @brief Parses a J-type instruction with the format "op label" into an AST node
 /// @param tokens
 /// @param index
@@ -261,71 +267,3 @@ void parse_tokens(const Token *tokens, int num_tokens, AST *ast)
         }
     }
 }
-
-// void print_token(const Token *token) {
-//     const char *token_type_str[] = {
-//         "Identifier",
-//         "Register",
-//         "Zero",
-//         "Decimal Constant",
-//         "Hexadecimal Constant",
-//         "Comma",
-//         "Left Parenthesis",
-//         "Right Parenthesis",
-//         "Error",
-//         "Unknown"
-//     };
-
-//     printf("Token: %s, Type: %s\n", token->value, token_type_str[token->type]);
-// }
-
-// void print_ast(const AST *ast) {
-//     for (int i = 0; i < ast->size; i++) {
-//         ASTNode node = ast->nodes[i];
-//         switch (node.type) {
-//             case NODE_R_TYPE:
-//                 printf("R-Type Instruction: %s %s, %s, %s\n",
-//                     node.data.rtype.op.value,
-//                     node.data.rtype.rd.value,
-//                     node.data.rtype.rs.value,
-//                     node.data.rtype.rt.value);
-//                 break;
-//             case NODE_I_TYPE:
-//                 printf("I-Type Instruction: %s %s, %s, %s\n",
-//                     node.data.itype.op.value,
-//                     node.data.itype.rt.value,
-//                     node.data.itype.rs.value,
-//                     node.data.itype.immediate.value);
-//                 break;
-//             case NODE_J_TYPE:
-//                 printf("J-Type Instruction: %s %s\n",
-//                     node.data.jtype.op.value,
-//                     node.data.jtype.address.value);
-//                 break;
-//             default:
-//                 printf("Unknown Node Type\n");
-//                 break;
-//         }
-//     }
-// }
-
-// int main() {
-//     const char *input = "add $t0, $t1, $t2\n"
-//                         "lw $t6, 0($t7)\n"
-//                         "sw $t8, 4($t9)\n"
-//                         "beq $t3, $t4, 100\n"
-//                         "j 1000\n";
-
-//     Token tokens[MAX_TOKENS];
-//     int num_tokens = 0;
-
-//     tokenize(input, tokens, &num_tokens);
-
-//     printf("Number of tokens: %d\n", num_tokens);
-
-//     AST ast;
-//     parse_tokens(tokens, num_tokens, &ast);
-//     print_ast(&ast);
-
-//     return 0;
-// }
