@@ -87,7 +87,7 @@ TokenType get_const_token_type(char *const_val)
 /// Adds proper tokens to array for a lw $reg, const($reg) type instruction
 void token_add_instr_rg_off_rg(Token tokens[], int *count, char *instr, char *reg1, char *offset, char *reg2)
 {
-    tokens[(*count)++] = (Token){.type = TOKEN_IDENTIFIER, .value = instr};
+    tokens[(*count)++] = (Token){.type = TOKEN_INSTRUCTION, .value = instr};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg1};
     tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
     tokens[(*count)++] = (Token){.type = get_const_token_type(offset), offset};
@@ -99,7 +99,7 @@ void token_add_instr_rg_off_rg(Token tokens[], int *count, char *instr, char *re
 /// Adds proper tokens to array for an add $reg1, $reg2, $reg3 type instruction
 void token_add_instr_rg_rg_rg(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *reg3)
 {
-    tokens[(*count)++] = (Token){.type = TOKEN_IDENTIFIER, .value = instr};
+    tokens[(*count)++] = (Token){.type = TOKEN_INSTRUCTION, .value = instr};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg1};
     tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg2};
@@ -110,7 +110,7 @@ void token_add_instr_rg_rg_rg(Token tokens[], int *count, char *instr, char *reg
 /// Adds proper tokens to array for an add $reg1, $reg2, dec_const type instruction
 void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *const_val)
 {
-    tokens[(*count)++] = (Token){.type = TOKEN_IDENTIFIER, .value = instr};
+    tokens[(*count)++] = (Token){.type = TOKEN_INSTRUCTION, .value = instr};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg1};
     tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg2};

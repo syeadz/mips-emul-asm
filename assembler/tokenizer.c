@@ -6,6 +6,8 @@ typedef enum
     START,
     WHITESPACE,
     IDENTIFIER,
+    INSTRUCTION,
+    LABEL,
     REGISTER_PREFIX,
     REGISTER,
     REGISTER_ZERO_E,
@@ -20,7 +22,6 @@ typedef enum
     R_PAREN,
     COMMENT,
     ERROR,
-    FINAL
 } State;
 
 // Function prototypes
@@ -37,17 +38,17 @@ State next_state(State current, char input)
     // START state is the initial state, where the DFA starts processing the input
     case START:
         if (input == '#')
-        {
             return COMMENT;
-        }
         if (isalpha(input))
             return IDENTIFIER;
+
         if (isdigit(input))
         {
             if (input == '0')
                 return ZERO;
             return DEC_CONST;
         }
+
         if (input == ',')
             return COMMA;
         if (input == '(')
@@ -58,7 +59,8 @@ State next_state(State current, char input)
             return REGISTER_PREFIX;
         if (isspace(input))
             return WHITESPACE;
-        break;
+
+        return ERROR;
 
     case COMMENT:
         if (input != '\n')
@@ -69,7 +71,7 @@ State next_state(State current, char input)
     case WHITESPACE:
         if (isspace(input))
             return WHITESPACE;
-        return next_state(START, input);
+        break;
 
     // IDENTIFIER state is used to classify identifiers, which are sequences of letters
     case IDENTIFIER:
@@ -191,6 +193,10 @@ const char *state_to_str(State state)
     {
     case IDENTIFIER:
         return "Identifier";
+    case INSTRUCTION:
+        return "Instruction";
+    case LABEL:
+        return "Label";
     case REGISTER:
         return "Register";
     case REGISTER_ZERO_0:
@@ -207,10 +213,8 @@ const char *state_to_str(State state)
         return "Left Parenthesis";
     case R_PAREN:
         return "Right Parenthesis";
-    case ERROR:
-        return "Error";
     default:
-        return "Unknown";
+        return "Error";
     }
 }
 
@@ -222,7 +226,7 @@ TokenType state_to_token_type(State state)
     switch (state)
     {
     case IDENTIFIER:
-        return TOKEN_IDENTIFIER;
+        return TOKEN_INSTRUCTION;
     case REGISTER:
         return TOKEN_REGISTER;
     case REGISTER_ZERO_0:
@@ -239,9 +243,7 @@ TokenType state_to_token_type(State state)
         return TOKEN_L_PAREN;
     case R_PAREN:
         return TOKEN_R_PAREN;
-    case ERROR:
-        return TOKEN_ERROR;
     default:
-        return TOKEN_UNKNOWN;
+        return TOKEN_ERROR;
     }
 }

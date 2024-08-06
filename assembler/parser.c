@@ -235,7 +235,7 @@ void parse_tokens(const Token *tokens, int num_tokens, AST *ast)
 
     while (index < num_tokens)
     {
-        if (tokens[index].type == TOKEN_IDENTIFIER)
+        if (tokens[index].type == TOKEN_INSTRUCTION)
         {
             // TODO: Create function to check token instruction type
             if (strcmp(tokens[index].value, "add") == 0)

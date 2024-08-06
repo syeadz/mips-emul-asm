@@ -6,8 +6,10 @@
 
 #define MAX_TOKENS 100
 
-typedef enum {
-    TOKEN_IDENTIFIER,
+typedef enum
+{
+    TOKEN_INSTRUCTION,
+    TOKEN_LABEL,
     TOKEN_REGISTER,
     TOKEN_ZERO,
     TOKEN_DEC_CONST,
@@ -26,8 +28,8 @@ typedef struct
 } Token;
 
 /// @brief Tokenizes the input string into an array of tokens.
-/// @param input 
-/// @param tokens 
-/// @param num_tokens 
-/// @return 
+/// @param input
+/// @param tokens
+/// @param num_tokens
+/// @return
 void tokenize(const char *input, Token *tokens, int *num_tokens);
