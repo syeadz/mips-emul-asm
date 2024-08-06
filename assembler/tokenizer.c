@@ -5,7 +5,6 @@ typedef enum
 {
     START,
     WHITESPACE,
-    IDENTIFIER,
     INSTRUCTION,
     LABEL,
     REGISTER_PREFIX,
@@ -40,7 +39,7 @@ State next_state(State current, char input)
         if (input == '#')
             return COMMENT;
         if (isalpha(input))
-            return IDENTIFIER;
+            return INSTRUCTION;
 
         if (isdigit(input))
         {
@@ -65,19 +64,19 @@ State next_state(State current, char input)
     case COMMENT:
         if (input != '\n')
             return COMMENT;
-        break;
+        return START;
 
     // WHITESPACE state is used to skip over whitespace characters
     case WHITESPACE:
         if (isspace(input))
             return WHITESPACE;
-        break;
+        return START;
 
     // IDENTIFIER state is used to classify identifiers, which are sequences of letters
-    case IDENTIFIER:
+    case INSTRUCTION:
         if (isalnum(input))
-            return IDENTIFIER;
-        break;
+            return INSTRUCTION;
+        return START;
 
     // REGISTER_PREFIX means $ and the next character should be a valid register name (t, s, a, v, z)
     case REGISTER_PREFIX:
@@ -191,8 +190,6 @@ const char *state_to_str(State state)
 {
     switch (state)
     {
-    case IDENTIFIER:
-        return "Identifier";
     case INSTRUCTION:
         return "Instruction";
     case LABEL:
@@ -225,7 +222,7 @@ TokenType state_to_token_type(State state)
 {
     switch (state)
     {
-    case IDENTIFIER:
+    case INSTRUCTION:
         return TOKEN_INSTRUCTION;
     case REGISTER:
         return TOKEN_REGISTER;
