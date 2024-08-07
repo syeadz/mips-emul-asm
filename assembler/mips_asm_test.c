@@ -5,6 +5,7 @@
 void token_add_instr_rg_off_rg(Token tokens[], int *count, char *instr, char *reg1, char *offset, char *reg2);
 void token_add_instr_rg_rg_rg(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *reg3);
 void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *const_val);
+void token_add_instr_const(Token tokens[], int *count, char *instr, char *const_val);
 
 // ********* function tests ********* //
 
@@ -14,6 +15,7 @@ MU_TEST(test_add_asm)
                  "lw $t2, 52($zero)\n"
                  "# ignore my comment\n"
                  "add $t0, $t1, $t2\n"
+                 "jal 0x400000\n"
                  "sw $t0, 0x38($zero)\n"
                  "lw $t3, 0X38($zero)\n"
                  "#ignore my comment again\n"
@@ -24,13 +26,14 @@ MU_TEST(test_add_asm)
 
     tokenize(code, tokens, &token_count);
 
-    mu_assert(token_count == 40, "Token count wrong");
+    mu_assert(token_count == 42, "Token count wrong");
 
-    Token correct_tokens[40];
+    Token correct_tokens[42];
     int count = 0;
     token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t1", "48", "$zero");
     token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t2", "52", "$zero");
     token_add_instr_rg_rg_rg(correct_tokens, &count, "add", "$t0", "$t1", "$t2");
+    token_add_instr_const(correct_tokens, &count, "jal", "0x400000");
     token_add_instr_rg_off_rg(correct_tokens, &count, "sw", "$t0", "0x38", "$zero");
     token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t3", "0X38", "$zero");
     token_add_instr_rg_rg_const(correct_tokens, &count, "beq", "$t0", "$t3", "9");
@@ -115,5 +118,12 @@ void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *
     tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
     tokens[(*count)++] = (Token){.type = TOKEN_REGISTER, .value = reg2};
     tokens[(*count)++] = (Token){.type = TOKEN_COMMA, .value = ","};
+    tokens[(*count)++] = (Token){.type = get_const_token_type(const_val), .value = const_val};
+}
+
+/// Adds proper tokens to array for an instruction with a constant value
+void token_add_instr_const(Token tokens[], int *count, char *instr, char *const_val)
+{
+    tokens[(*count)++] = (Token){.type = TOKEN_INSTRUCTION, .value = instr};
     tokens[(*count)++] = (Token){.type = get_const_token_type(const_val), .value = const_val};
 }

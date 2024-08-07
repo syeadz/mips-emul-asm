@@ -18,7 +18,6 @@ typedef enum
     TOKEN_L_PAREN,
     TOKEN_R_PAREN,
     TOKEN_ERROR,
-    TOKEN_UNKNOWN
 } TokenType;
 
 typedef struct
@@ -27,9 +26,9 @@ typedef struct
     char *value;
 } Token;
 
-/// @brief Tokenizes the input string into an array of tokens.
+/// @brief Tokenizes the input string into an array of tokens. Returns 0 if successful, 1 otherwise.
 /// @param input
 /// @param tokens
 /// @param num_tokens
-/// @return
-void tokenize(const char *input, Token *tokens, int *num_tokens);
+/// @return 0 if successful, 1 otherwise
+int tokenize(const char *input, Token *tokens, int *num_tokens);
