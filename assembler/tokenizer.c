@@ -8,6 +8,8 @@ typedef enum
     INSTRUCTION,
     LABEL_INTER,
     LABEL,
+    DIRECTIVE,
+    STRING,
     DEC_CONST,
     REGISTER_PREFIX,
     REGISTER_INTER,
@@ -48,6 +50,10 @@ State next_state(State current, char input)
             return R_PAREN;
         if (input == '$')
             return REGISTER_PREFIX;
+        if (input == '.')
+            return DIRECTIVE;
+        if (input == '"')
+            return STRING;
         if (isspace(input))
             return WHITESPACE;
         if (isalpha(input))
@@ -96,6 +102,16 @@ State next_state(State current, char input)
         return ERROR;
 
     case LABEL:
+        return START;
+
+    case DIRECTIVE:
+        if (isalpha(input)) 
+            return DIRECTIVE;
+        return START;
+
+    case STRING:
+        if (input != '"')
+            return STRING;
         return START;
 
     // REGISTER_PREFIX means $ and the next character should be a valid register name, minus zero (t, s, a, v)
@@ -283,6 +299,10 @@ TokenType state_to_token_type(State state)
         return TOKEN_LABEL;
     case REGISTER:
         return TOKEN_REGISTER;
+    case DIRECTIVE:
+        return TOKEN_DIRECTIVE;
+    case STRING:
+        return TOKEN_STRING;
     case ZERO:
         return TOKEN_ZERO;
     case DEC_CONST:

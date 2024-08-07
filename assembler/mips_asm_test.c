@@ -6,12 +6,14 @@ void token_add_instr_rg_off_rg(Token tokens[], int *count, char *instr, char *re
 void token_add_instr_rg_rg_rg(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *reg3);
 void token_add_instr_rg_rg_const(Token tokens[], int *count, char *instr, char *reg1, char *reg2, char *const_val);
 void token_add_instr_const(Token tokens[], int *count, char *instr, char *const_val);
+void token_add_directive_no_arg(Token tokens[], int *count, char *direc);
 
 // ********* function tests ********* //
 
 MU_TEST(test_add_asm)
 {
-    char *code = "lw $t1, 48($zero)\n"
+    char *code = ".text\n"
+                 "lw $t1, 48($zero)\n"
                  "lw $t2, 52($zero)\n"
                  "# ignore my comment\n"
                  "add $t0, $t1, $t2\n"
@@ -26,10 +28,12 @@ MU_TEST(test_add_asm)
 
     tokenize(code, tokens, &token_count);
 
-    mu_assert(token_count == 42, "Token count wrong");
+    mu_assert(token_count == 43, "Token count wrong");
 
-    Token correct_tokens[42];
+    Token correct_tokens[43];
     int count = 0;
+
+    token_add_directive_no_arg(correct_tokens, &count, ".text");
     token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t1", "48", "$zero");
     token_add_instr_rg_off_rg(correct_tokens, &count, "lw", "$t2", "52", "$zero");
     token_add_instr_rg_rg_rg(correct_tokens, &count, "add", "$t0", "$t1", "$t2");
@@ -85,6 +89,11 @@ TokenType get_const_token_type(char *const_val)
     }
 
     return TOKEN_ERROR;
+}
+
+void token_add_directive_no_arg(Token tokens[], int *count, char *direc)
+{
+    tokens[(*count)++] = (Token){.type = TOKEN_DIRECTIVE, .value = direc};
 }
 
 /// Adds proper tokens to array for a lw $reg, const($reg) type instruction
